@@ -22,19 +22,45 @@ an interactive 3D impress.js deck on the right side of your editor.
 
 ## Installation
 
-### From source
+### 1. Install the CLI (required)
+
+The extension's **Export** command shells out to the
+`@machine-w/mddeck-cli` binary. You **must install it first**, otherwise
+the preview will work but the Export command will fail.
+
+```bash
+# Global install (recommended)
+npm install -g @machine-w/mddeck-cli
+
+# Verify it's reachable
+which mddeck    # should print /usr/local/bin/mddeck (or similar)
+mddeck --help
+```
+
+You can also use `npx @machine-w/mddeck-cli …` as a one-off, but the
+extension's PATH lookup assumes the binary is globally available.
+
+If `mddeck` isn't in PATH, the export command will show:
+
+> `mddeck CLI not found. Install it with: \`npm install -g @machine-w/mddeck-cli\``
+
+### 2. Install the extension
+
+#### From source
 
 ```bash
 git clone https://github.com/.../mddeck.git
 cd mddeck/packages/vscode
 yarn install
-yarn package   # produces .vsix
-code --install-extension mddeck-vscode-0.1.0.vsix
+yarn package                       # produces mddeck-vscode-0.1.2.vsix
+code --install-extension mddeck-vscode-0.1.2.vsix
 ```
 
-### Marketplace
+#### From VS Code Marketplace (once published)
 
-_Coming soon — once published._
+1. Open VS Code → **Extensions** panel (`Ctrl+Shift+X`)
+2. Search "mddeck" → click **Install**
+3. Reload any open Markdown files to see the live preview
 
 ## Usage
 

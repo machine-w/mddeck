@@ -166,7 +166,9 @@
     "test": "vitest run",
     "package": "vsce package"
   },
-  "dependencies": {},
+  "dependencies": {
+    "yarn": "^1.22.22"
+  },
   "devDependencies": {
     "@types/vscode": "1.85.0",
     "typescript": "^5.4.5",
