@@ -1,4 +1,4 @@
-# @mddeck/cli
+# @machine-w/mddeck-cli
 
 > 把 Markdown 转换为由 [impress.js](https://github.com/impress/impress.js)
 > 驱动的 3D 演示文稿。
@@ -43,10 +43,10 @@ $ mddeck presentation.md -o slides.html
 
 ```bash
 # 项目本地安装（推荐）
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 
 # 或一次性用 npx
-npx @mddeck/cli presentation.md
+npx @machine-w/mddeck-cli presentation.md
 ```
 
 ### 可选依赖
@@ -242,7 +242,7 @@ pandoc README.md -t markdown | mddeck --stdin --pdf -o deck.pdf
 ```js
 // mddeck.config.js
 
-/** @type {import('@mddeck/core').MdDeckOptions} */
+/** @type {import('@machine-w/mddeck-core').MdDeckOptions} */
 const mddeck = {
   theme: 'gaia',
   math: 'katex',
@@ -471,7 +471,7 @@ module.exports = {
 或用自定义白名单：
 
 ```js
-const { defaultHTMLAllowList } = require('@mddeck/core')  // (尚未导出 —— 用对象形式)
+const { defaultHTMLAllowList } = require('@machine-w/mddeck-core')  // (尚未导出 —— 用对象形式)
 module.exports = {
   mddeck: {
     html: {
@@ -519,7 +519,7 @@ A **markdown-first** slide deck engine.
 # Code
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({ theme: 'gaia' })
 const html = deck.render('# Hello')
@@ -576,7 +576,7 @@ npm install katex
 
 ### "Package subpath './plugins_katex/index.js' is not defined"
 
-你装了 `@mddeck/cli` 但 `@mddeck/core` 不能解析。请一起装两个包，
+你装了 `@machine-w/mddeck-cli` 但 `@machine-w/mddeck-core` 不能解析。请一起装两个包，
 或用 [monorepo 设置](https://github.com/...)。
 
 ### 幻灯片重叠 / 叠在一起
@@ -593,7 +593,7 @@ Windows 上用 `Ctrl+Break`。
 
 ## 另请参阅
 
-- [@mddeck/core](https://github.com/.../packages/core) —— 底层库
+- [@machine-w/mddeck-core](https://github.com/.../packages/core) —— 底层库
 - [impress.js 文档](https://github.com/impress/impress.js) —— 3D 渲染引擎
 - [marp 文档](https://marp.app/) —— front-matter 和 directive 系统的灵感来源
 - [markdown-it 文档](https://markdown-it.github.io/markdown-it/) ——

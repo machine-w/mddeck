@@ -34,12 +34,12 @@ yarn install
 
 该命令会：
 
-- 解析 `@mddeck/core`、`@mddeck/cli`、`@mddeck/vscode` 三个工作区包
+- 解析 `@machine-w/mddeck-core`、`@machine-w/mddeck-cli`、`@machine-w/mddeck-vscode` 三个工作区包
 - 安装 `playwright`（通过 examples 目录）、`chromium-bidi` 等
-- 把三个包链接起来，使得 CLI 能 `import('@mddeck/core')`、VSCode 扩展
-  能 `import('@mddeck/cli')`
+- 把三个包链接起来，使得 CLI 能 `import('@machine-w/mddeck-core')`、VSCode 扩展
+  能 `import('@machine-w/mddeck-cli')`
 
-> **提示**：如果看到 `Couldn't find package "@mddeck/core@workspace:*"`，
+> **提示**：如果看到 `Couldn't find package "@machine-w/mddeck-core@workspace:*"`，
 > 说明 `package.json` 失去同步了。请运行 `yarn install --force`。
 
 验证安装：
@@ -61,8 +61,8 @@ yarn build
 或单独编译：
 
 ```bash
-yarn workspace @mddeck/core build        # → packages/core/dist/
-yarn workspace @mddeck/cli build        # → packages/cli/dist/
+yarn workspace @machine-w/mddeck-core build        # → packages/core/dist/
+yarn workspace @machine-w/mddeck-cli build        # → packages/cli/dist/
 cd packages/vscode && yarn build       # → packages/vscode/dist/
 ```
 
@@ -79,10 +79,10 @@ core 包是 CLI 和 VSCode 扩展的依赖，所以改库代码时要先编译 c
 yarn test
 
 # 只跑 core（M1 + M2 + M2.5：解析器、directives、数学、emoji、XSS、slug、katex）
-yarn workspace @mddeck/core test
+yarn workspace @machine-w/mddeck-core test
 
 # 只跑 CLI（文件 I/O、配置加载、输出路径）
-yarn workspace @mddeck/cli test
+yarn workspace @machine-w/mddeck-cli test
 
 # 只跑 VSCode 扩展（directives 定义、package.json 完整性）
 yarn workspace mddeck-vscode test
@@ -103,7 +103,7 @@ Tests       41 passed (41)
 Watch 模式（边写代码边测试）：
 
 ```bash
-yarn workspace @mddeck/core test:watch
+yarn workspace @machine-w/mddeck-core test:watch
 ```
 
 ---
@@ -287,9 +287,9 @@ VSCode 会以 `mddeck for VS Code` 已加载的状态启动。Output 面板
 
 | ✓ | 测试项 | 方法 |
 |---|---|---|
-| ☐ | core 编译通过 | `yarn workspace @mddeck/core build` |
-| ☐ | core 测试通过（28 个） | `yarn workspace @mddeck/core test` |
-| ☐ | CLI 编译通过 | `yarn workspace @mddeck/cli build` |
+| ☐ | core 编译通过 | `yarn workspace @machine-w/mddeck-core build` |
+| ☐ | core 测试通过（28 个） | `yarn workspace @machine-w/mddeck-core test` |
+| ☐ | CLI 编译通过 | `yarn workspace @machine-w/mddeck-cli build` |
 | ☐ | CLI 转 HTML | `node packages/cli/bin/mddeck.js examples/basic.md -o /tmp/x.html` |
 | ☐ | CLI 转 PDF | `... --pdf -o /tmp/x.pdf` 然后 `file /tmp/x.pdf` |
 | ☐ | CLI watch 工作 | `... --watch`，编辑 .md 验证重新构建 |
@@ -355,7 +355,7 @@ mddeck: true
 
 没有标记的话，预览会 fallback 到普通 Markdown 渲染。
 
-### 测试报 "Cannot find module @mddeck/core"
+### 测试报 "Cannot find module @machine-w/mddeck-core"
 
 大概率是 `node_modules` 过期了。修复：
 

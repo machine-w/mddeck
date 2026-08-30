@@ -1,5 +1,5 @@
 /**
- * Public API of @mddeck/cli.
+ * Public API of @machine-w/mddeck-cli.
  */
 
 export { cliInterface } from './mddeck-cli.js'

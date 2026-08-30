@@ -1,10 +1,10 @@
 /**
  * mddeck KaTeX plugin — registers the KaTeX math library with the
- * marp-core-compatible math framework inside @mddeck/core.
+ * marp-core-compatible math framework inside @machine-w/mddeck-core.
  *
  * Usage:
- *   import { MdDeck } from '@mddeck/core'
- *   import { katexMarpCorePlugin } from '@mddeck/core/katex'
+ *   import { MdDeck } from '@machine-w/mddeck-core'
+ *   import { katexMarpCorePlugin } from '@machine-w/mddeck-core/katex'
  *   const md = new MdDeck({ math: 'katex' })
  *   md.use(katexMarpCorePlugin())
  *

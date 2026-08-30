@@ -6,7 +6,7 @@
 
 This guide is for the **maintainer**. It assumes you have push access
 to the [`machine-w/mddeck`](https://github.com/machine-w/mddeck) repo
-and an npm account with publish rights to the `@mddeck/*` scope (and
+and an npm account with publish rights to the `@machine-w/*` scope (and
 the `mddeck-vscode` publisher on the VS Code Marketplace).
 
 ---
@@ -16,7 +16,7 @@ the `mddeck-vscode` publisher on the VS Code Marketplace).
 1. [Token safety — read this first](#token-safety--read-this-first)
 2. [Pre-release checklist](#pre-release-checklist)
 3. [GitHub: tag & release](#github-tag--release)
-4. [npm: publish `@mddeck/core` & `@mddeck/cli`](#npm-publish-mddeckcore--mddeckcli)
+4. [npm: publish `@machine-w/mddeck-core` & `@machine-w/mddeck-cli`](#npm-publish-mddeckcore--mddeckcli)
 5. [VS Code: package & publish `mddeck-vscode`](#vs-code-package--publish-mddeck-vscode)
 6. [Post-release verification](#post-release-verification)
 7. [Rollback procedure](#rollback-procedure)
@@ -27,7 +27,7 @@ the `mddeck-vscode` publisher on the VS Code Marketplace).
 ## Token safety — read this first
 
 > ⚠️ **NEVER commit a real npm token to git.** If it leaks, anyone can
-> publish malicious code to the `@mddeck/*` scope. GitHub will auto-revoke
+> publish malicious code to the `@machine-w/*` scope. GitHub will auto-revoke
 > leaked tokens, but only after the damage is done.
 
 The repo is configured to keep tokens out of source control:
@@ -160,8 +160,8 @@ First public release.
 
 ### Highlights
 
-- **`@mddeck/core` v0.1.0** — markdown → impress.js rendering library
-- **`@mddeck/cli` v0.1.0** — `mddeck` command for HTML / PDF / watch / server
+- **`@machine-w/mddeck-core` v0.1.0** — markdown → impress.js rendering library
+- **`@machine-w/mddeck-cli` v0.1.0** — `mddeck` command for HTML / PDF / watch / server
 - **`mddeck-vscode` v0.1.0** — VS Code extension with live preview
 
 ### What's included
@@ -177,9 +177,9 @@ First public release.
 ### Installation
 
 \`\`\`bash
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 # or use npx
-npx @mddeck/cli presentation.md -o slides.html
+npx @machine-w/mddeck-cli presentation.md -o slides.html
 \`\`\`
 
 ### Full changelog
@@ -192,10 +192,10 @@ package descriptions and the VS Code extension page.
 
 ---
 
-## npm: publish `@mddeck/core` & `@mddeck/cli`
+## npm: publish `@machine-w/mddeck-core` & `@machine-w/mddeck-cli`
 
-`@mddeck/core` is the **foundation** — publish it first, because
-`@mddeck/cli` depends on it. (`mddeck-vscode` depends on `@mddeck/cli`,
+`@machine-w/mddeck-core` is the **foundation** — publish it first, because
+`@machine-w/mddeck-cli` depends on it. (`mddeck-vscode` depends on `@machine-w/mddeck-cli`,
 so it should be published *after* the CLI is on npm.)
 
 There are **three ways** to publish. Pick one:
@@ -207,7 +207,7 @@ The repo includes `scripts/publish.sh` which:
 2. Renders `.npmrc.template` → `.npmrc` (gitignored, `chmod 600`)
 3. Verifies working tree is clean, tests pass, versions match
 4. Builds everything
-5. Publishes `@mddeck/core`, then `@mddeck/cli`
+5. Publishes `@machine-w/mddeck-core`, then `@machine-w/mddeck-cli`
 6. Cleans up `.npmrc` automatically
 
 ```bash
@@ -254,7 +254,7 @@ the **safest option** for teams.
    - Verifies all 3 package.json versions match the input
    - Runs the test suite
    - Builds all packages
-   - Publishes `@mddeck/core` then `@mddeck/cli` with **provenance**
+   - Publishes `@machine-w/mddeck-core` then `@machine-w/mddeck-cli` with **provenance**
    - Posts a summary with the npm URLs
 
 The token never appears in logs or the repository source — it lives
@@ -269,12 +269,12 @@ npm login --auth-type=legacy
 
 # 2. Verify you have publish rights
 npm whoami
-npm access ls-packages @mddeck/core    # should show your username
+npm access ls-packages @machine-w/mddeck-core    # should show your username
 
-# 3. Bump the @mddeck/core dependency in packages/cli/package.json
+# 3. Bump the @machine-w/mddeck-core dependency in packages/cli/package.json
 #    from "file:../core" to "^0.1.0" (or whatever version you're publishing)
 cd packages/cli
-npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
+npm pkg set 'dependencies.@machine-w/mddeck-core'='^0.1.0'
 cd ../..
 
 # 4. Build & dry-run
@@ -300,14 +300,14 @@ in CI, but works locally without it).
 
 ```bash
 # Check the packages are on npm
-npm view @mddeck/core
-npm view @mddeck/cli
+npm view @machine-w/mddeck-core
+npm view @machine-w/mddeck-cli
 
 # Install in a clean directory to confirm it works
 mkdir /tmp/verify-npm && cd /tmp/verify-npm
 npm init -y
-npm install @mddeck/core @mddeck/cli
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
+npm install @machine-w/mddeck-core @machine-w/mddeck-cli
+node -e "const { MdDeck } = require('@machine-w/mddeck-core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 # → should print HTML with <div class="step">
 
 # And the CLI
@@ -318,8 +318,8 @@ npx mddeck /path/to/some.md -o /tmp/from-npm.html
 
 ## VS Code: package & publish `mddeck-vscode`
 
-`mddeck-vscode` depends on `@mddeck/cli` (and transitively on
-`@mddeck/core`), so **publish those to npm first**.
+`mddeck-vscode` depends on `@machine-w/mddeck-cli` (and transitively on
+`@machine-w/mddeck-core`), so **publish those to npm first**.
 
 ### Prerequisites
 
@@ -381,10 +381,10 @@ After publishing, run the **cross-channel smoke test**:
 # 1. Core + CLI from npm
 mkdir /tmp/verify-all && cd /tmp/verify-all
 npm init -y
-npm install @mddeck/core @mddeck/cli
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
+npm install @machine-w/mddeck-core @machine-w/mddeck-cli
+node -e "const { MdDeck } = require('@machine-w/mddeck-core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 
-# 2. CLI from npm (uses the installed @mddeck/core, not the local one)
+# 2. CLI from npm (uses the installed @machine-w/mddeck-core, not the local one)
 npx mddeck examples/basic.md -o /tmp/from-npm.html
 xdg-open /tmp/from-npm.html
 
@@ -408,8 +408,8 @@ If a release is broken, you have three options depending on severity:
 ### Option 1: unpublish a single version (within 72 hours)
 
 ```bash
-npm unpublish @mddeck/core@0.1.0 --force
-npm unpublish @mddeck/cli@0.1.0 --force
+npm unpublish @machine-w/mddeck-core@0.1.0 --force
+npm unpublish @machine-w/mddeck-cli@0.1.0 --force
 ```
 
 **Warning**: npm only allows unpublishing within 72 hours of release, and
@@ -441,8 +441,8 @@ gh release create v0.1.1 --title "..." --notes "..."
 If you want to discourage new installs but keep it for existing users:
 
 ```bash
-npm deprecate @mddeck/core@0.1.0 "Critical bug, please upgrade to 0.1.1"
-npm deprecate @mddeck/cli@0.1.0 "Critical bug, please upgrade to 0.1.1"
+npm deprecate @machine-w/mddeck-core@0.1.0 "Critical bug, please upgrade to 0.1.1"
+npm deprecate @machine-w/mddeck-cli@0.1.0 "Critical bug, please upgrade to 0.1.1"
 ```
 
 For VS Code, unpublish via the Marketplace UI:
@@ -456,7 +456,7 @@ For VS Code, unpublish via the Marketplace UI:
 
 | Field | Value | Purpose |
 |---|---|---|
-| `name` | `@mddeck/core`, `@mddeck/cli`, `mddeck-vscode` | npm package name (note vscode has no scope) |
+| `name` | `@machine-w/mddeck-core`, `@machine-w/mddeck-cli`, `mddeck-vscode` | npm package name (note vscode has no scope) |
 | `version` | `X.Y.Z` | SemVer version; must match across all 3 packages |
 | `license` | `MIT` | SPDX license identifier |
 | `repository.type` | `"git"` | |
@@ -465,11 +465,11 @@ For VS Code, unpublish via the Marketplace UI:
 | `homepage` | `"https://github.com/machine-w/mddeck#readme"` | npm page link |
 | `engines.node` | `">=18"` | Node version requirement |
 
-### `package.json` for `@mddeck/core`
+### `package.json` for `@machine-w/mddeck-core`
 
 ```json
 {
-  "name": "@mddeck/core",
+  "name": "@machine-w/mddeck-core",
   "version": "0.1.0",
   "description": "Markdown → impress.js slide deck core (parser + theme + directives)",
   "main": "./dist/index.js",
@@ -489,15 +489,15 @@ For VS Code, unpublish via the Marketplace UI:
 }
 ```
 
-### `package.json` for `@mddeck/cli`
+### `package.json` for `@machine-w/mddeck-cli`
 
 ```json
 {
-  "name": "@mddeck/cli",
+  "name": "@machine-w/mddeck-cli",
   "version": "0.1.0",
   "bin": { "mddeck": "./bin/mddeck.js" },
   "dependencies": {
-    "@mddeck/core": "^0.1.0",          // ← bumped to ^X.Y.Z at release
+    "@machine-w/mddeck-core": "^0.1.0",          // ← bumped to ^X.Y.Z at release
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.2",
     "express": "^4.21.0",
@@ -520,7 +520,7 @@ For VS Code, unpublish via the Marketplace UI:
   "main": "./dist/extension.js",
   "engines": { "vscode": "^1.85.0" },
   "dependencies": {
-    "@mddeck/cli": "^0.1.0"           // ← bumped to ^X.Y.Z at release
+    "@machine-w/mddeck-cli": "^0.1.0"           // ← bumped to ^X.Y.Z at release
   }
 }
 ```
@@ -555,8 +555,8 @@ VSCODE
 □ vsce publish
 
 VERIFY
-□ npm view @mddeck/core
-□ npm view @mddeck/cli
+□ npm view @machine-w/mddeck-core
+□ npm view @machine-w/mddeck-cli
 □ npx mddeck examples/basic.md -o /tmp/x.html    (open in browser)
 □ npx mddeck examples/basic.md --pdf -o /tmp/x.pdf
 □ code --install-extension packages/vscode/mddeck-vscode-*.vsix

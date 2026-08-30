@@ -212,24 +212,10 @@
   resolved "https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz#f4c663e862f06dc98ca4d453862c46902789a18d"
   integrity sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==
 
-"@marp-team/marpit@^3.2.2":
-  version "3.2.2"
-  resolved "https://registry.npmmirror.com/@marp-team/marpit/-/marpit-3.2.2.tgz#291c8fb76758cde6a63afcb43fa1f3ed97c7f91f"
-  integrity sha512-7LJ6vuAA1jovkTMso2MLyhdjqtJAzjievCAF2PpIqHGH7CFG0e3a0hXQ++zMXinUggKt0pbhqa/q8UEdcYq5Pw==
-  dependencies:
-    "@csstools/postcss-is-pseudo-class" "^5.0.3"
-    cssesc "^3.0.0"
-    js-yaml "^4.3.0"
-    lodash.kebabcase "^4.1.1"
-    markdown-it "^14.2.0"
-    markdown-it-front-matter "^0.2.4"
-    postcss "^8.5.15"
-    postcss-nesting "^13.0.2"
-
-"@mddeck/cli@file:packages/cli":
+"@machine-w/mddeck-cli@file:packages/cli":
   version "0.1.0"
   dependencies:
-    "@mddeck/core" "file:../../../.cache/yarn/v6/npm-@mddeck-cli-0.1.0-49d20a89-1a69-48fe-a951-afee23733bd1-1788018564955/node_modules/@mddeck/core"
+    "@machine-w/mddeck-core" "file:../../../.cache/yarn/v6/npm-@machine-w-mddeck-cli-0.1.0-305e25e5-9034-47b5-8443-3b235ae40492-1788064081572/node_modules/@machine-w/core"
     chokidar "^3.6.0"
     cosmiconfig "^9.0.2"
     express "^4.21.0"
@@ -238,7 +224,7 @@
     ws "^8.18.0"
     yargs "^17.7.2"
 
-"@mddeck/core@file:packages/core":
+"@machine-w/mddeck-core@file:packages/core":
   version "0.1.0"
   dependencies:
     "@marp-team/marpit" "^3.2.2"
@@ -254,6 +240,20 @@
     twemoji "^14.0.2"
     twemoji-parser "^14.0.0"
     xss "^1.0.15"
+
+"@marp-team/marpit@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.npmmirror.com/@marp-team/marpit/-/marpit-3.2.2.tgz#291c8fb76758cde6a63afcb43fa1f3ed97c7f91f"
+  integrity sha512-7LJ6vuAA1jovkTMso2MLyhdjqtJAzjievCAF2PpIqHGH7CFG0e3a0hXQ++zMXinUggKt0pbhqa/q8UEdcYq5Pw==
+  dependencies:
+    "@csstools/postcss-is-pseudo-class" "^5.0.3"
+    cssesc "^3.0.0"
+    js-yaml "^4.3.0"
+    lodash.kebabcase "^4.1.1"
+    markdown-it "^14.2.0"
+    markdown-it-front-matter "^0.2.4"
+    postcss "^8.5.15"
+    postcss-nesting "^13.0.2"
 
 "@napi-rs/lzma-linux-x64-gnu@1.5.1":
   version "1.5.1"

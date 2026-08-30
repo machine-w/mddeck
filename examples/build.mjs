@@ -1,6 +1,6 @@
 /**
  * examples/build.mjs — Compile example markdown files into single-file HTML
- * decks using @mddeck/core + the bundled impress.js runtime.
+ * decks using @machine-w/mddeck-core + the bundled impress.js runtime.
  *
  * Usage: node examples/build.mjs [file.md ...]
  * If no files given, builds examples/basic.md → examples/basic.html

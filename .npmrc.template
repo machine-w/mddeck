@@ -22,6 +22,6 @@
 # Save exact versions in package-lock.json on `npm install`
 save-exact=true
 
-# Always include the @mddeck/* scope in `npm install @mddeck/...` (default in npm 7+)
-@mddeck:registry=https://registry.npmjs.org/
+# Always include the @machine-w/* scope in `npm install @machine-w/...` (default in npm 7+)
+@machine-w:registry=https://registry.npmjs.org/
 

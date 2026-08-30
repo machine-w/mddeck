@@ -157,7 +157,7 @@
     "package": "vsce package"
   },
   "dependencies": {
-    "@mddeck/cli": "file:../cli"
+    "@machine-w/mddeck-cli": "file:../cli"
   },
   "devDependencies": {
     "@types/vscode": "1.85.0",

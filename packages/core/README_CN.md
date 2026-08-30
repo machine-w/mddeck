@@ -1,10 +1,10 @@
-# @mddeck/core
+# @machine-w/mddeck-core
 
 > mddeck 解析器 + 主题 + directive 库。
 >
 > 把 Markdown 转换为 impress.js HTML，运行时零浏览器依赖。
 
-这是底层的核心库，同时驱动着 `@mddeck/cli` 命令行工具和
+这是底层的核心库，同时驱动着 `@machine-w/mddeck-cli` 命令行工具和
 `mddeck-vscode` 编辑器扩展。
 
 如果你想把 mddeck 集成到自己的工具里（构建流水线、静态站点生成器、
@@ -13,9 +13,9 @@
 ## 安装
 
 ```bash
-npm install @mddeck/core
+npm install @machine-w/mddeck-core
 # 或在 monorepo 中
-yarn add @mddeck/core
+yarn add @machine-w/mddeck-core
 ```
 
 **Peer dependencies**（大部分可选，只在你用到的功能需要时安装）：
@@ -29,7 +29,7 @@ yarn add @mddeck/core
 ## 5 分钟上手
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({
   theme: 'gaia',
@@ -157,11 +157,11 @@ CSS 变量 `--mddeck-bg`、`--mddeck-fg`、`--mddeck-accent` 由 scaffold
 
 ## 插件
 
-`@mddeck/core` 基于 [marpit](https://marpit.marp.app/)（基于 markdown-it
+`@machine-w/mddeck-core` 基于 [marpit](https://marpit.marp.app/)（基于 markdown-it
 的幻灯片框架）。你可以给 `MdDeck` 实例装任何 marpit 插件：
 
 ```ts
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 import { someCustomMarpitPlugin } from 'some-package'
 
 const deck = new MdDeck({ theme: 'default' })

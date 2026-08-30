@@ -1,4 +1,4 @@
-# @mddeck/cli
+# @machine-w/mddeck-cli
 
 > Convert Markdown to 3D slide decks powered by [impress.js](https://github.com/impress/impress.js).
 
@@ -43,10 +43,10 @@ below).
 
 ```bash
 # Local install (recommended for projects)
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 
 # Or one-off via npx
-npx @mddeck/cli presentation.md
+npx @machine-w/mddeck-cli presentation.md
 ```
 
 ### Optional dependencies
@@ -253,7 +253,7 @@ For project-wide defaults, create a `mddeck.config.js` (or `.mjs` / `.cjs` /
 ```js
 // mddeck.config.js
 
-/** @type {import('@mddeck/core').MdDeckOptions} */
+/** @type {import('@machine-w/mddeck-core').MdDeckOptions} */
 const mddeck = {
   theme: 'gaia',
   math: 'katex',
@@ -492,7 +492,7 @@ module.exports = {
 Or use a custom allowlist:
 
 ```js
-const { defaultHTMLAllowList } = require('@mddeck/core')  // (not yet exported — use object form)
+const { defaultHTMLAllowList } = require('@machine-w/mddeck-core')  // (not yet exported — use object form)
 module.exports = {
   mddeck: {
     html: {
@@ -541,7 +541,7 @@ A **markdown-first** slide deck engine.
 # Code
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({ theme: 'gaia' })
 const html = deck.render('# Hello')
@@ -600,7 +600,7 @@ Then either:
 
 ### "Package subpath './plugins_katex/index.js' is not defined"
 
-You installed `@mddeck/cli` but don't have `@mddeck/core` resolvable from
+You installed `@machine-w/mddeck-cli` but don't have `@machine-w/mddeck-core` resolvable from
 the same workspace. Either install both packages together, or use the
 [monorepo setup](https://github.com/...).
 
@@ -618,7 +618,7 @@ Press `Ctrl+C` to stop. If the process is stuck, send `SIGINT`
 
 ## See also
 
-- [@mddeck/core](https://github.com/.../packages/core) — the underlying library
+- [@machine-w/mddeck-core](https://github.com/.../packages/core) — the underlying library
 - [impress.js documentation](https://github.com/impress/impress.js) — the 3D
   rendering engine
 - [marp documentation](https://marp.app/) — the syntax inspiration for the

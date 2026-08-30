@@ -80,9 +80,9 @@ This is a monorepo using [Yarn workspaces](https://classic.yarnpkg.com/lang/en/d
 ```
 mddeck/
 ├── packages/
-│   ├── core/                # @mddeck/core — parser + theme + directives
+│   ├── core/                # @machine-w/mddeck-core — parser + theme + directives
 │   │                         (the library that powers the CLI & VSCode)
-│   ├── cli/                 # @mddeck/cli — the `mddeck` command
+│   ├── cli/                 # @machine-w/mddeck-cli — the `mddeck` command
 │   └── vscode/              # mddeck-vscode — VSCode extension (planned)
 ├── examples/                # ready-made Markdown decks
 └── tsconfig.base.json
@@ -92,8 +92,8 @@ mddeck/
 
 | Package | Status | Description |
 |---|---|---|
-| `@mddeck/core` | ✅ v0.1.0 | The framework: Markdown → impress.js HTML + CSS |
-| `@mddeck/cli` | ✅ v0.1.0 | The `mddeck` CLI command (HTML / PDF / watch / server) |
+| `@machine-w/mddeck-core` | ✅ v0.1.0 | The framework: Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.0 | The `mddeck` CLI command (HTML / PDF / watch / server) |
 | `mddeck-vscode` | 🚧 planned | VSCode extension with live preview |
 
 ---
@@ -103,9 +103,9 @@ mddeck/
 ### 1. Install the CLI
 
 ```bash
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 # or
-npx @mddeck/cli --help
+npx @machine-w/mddeck-cli --help
 ```
 
 ### 2. Write a deck
@@ -146,14 +146,14 @@ reference.
 
 ---
 
-## Using `@mddeck/core` programmatically
+## Using `@machine-w/mddeck-core` programmatically
 
 If you want to integrate mddeck into your own tool (a build pipeline, a
 static site generator, a server-side rendering service), use the library
 directly:
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({
   theme: 'default',

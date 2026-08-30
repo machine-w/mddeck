@@ -18,7 +18,7 @@ const IMPRESS_JS_PATH = resolve(__dirname, '../../ref/impress.js/js/impress.js')
 
 mkdirSync(OUT_DIR, { recursive: true })
 
-// 1. Build the HTML using @mddeck/core + inlined impress.js bundle
+// 1. Build the HTML using @machine-w/mddeck-core + inlined impress.js bundle
 const markdown = readFileSync(MD_PATH, 'utf-8')
 const impressBundle = readFileSync(IMPRESS_JS_PATH, 'utf-8')
 const deck = new MdDeck({ math: 'katex' })

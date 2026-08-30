@@ -36,12 +36,12 @@ yarn install
 
 This will:
 
-- Resolve `@mddeck/core`, `@mddeck/cli`, and `@mddeck/vscode` workspaces
+- Resolve `@machine-w/mddeck-core`, `@machine-w/mddeck-cli`, and `@machine-w/mddeck-vscode` workspaces
 - Install `playwright` (via the examples folder), `chromium-bidi`, etc.
-- Link the packages together so the CLI can `import('@mddeck/core')`
-  and the VSCode extension can `import('@mddeck/cli')`
+- Link the packages together so the CLI can `import('@machine-w/mddeck-core')`
+  and the VSCode extension can `import('@machine-w/mddeck-cli')`
 
-> **Tip**: If you see `Couldn't find package "@mddeck/core@workspace:*"`,
+> **Tip**: If you see `Couldn't find package "@machine-w/mddeck-core@workspace:*"`,
 > your `package.json` got desynchronized. Run `yarn install --force`.
 
 Verify install:
@@ -63,8 +63,8 @@ yarn build
 Or build individually:
 
 ```bash
-yarn workspace @mddeck/core build        # → packages/core/dist/
-yarn workspace @mddeck/cli build        # → packages/cli/dist/
+yarn workspace @machine-w/mddeck-core build        # → packages/core/dist/
+yarn workspace @machine-w/mddeck-cli build        # → packages/cli/dist/
 cd packages/vscode && yarn build       # → packages/vscode/dist/
 ```
 
@@ -83,10 +83,10 @@ feedback loop, or together via the workspace root.
 yarn test
 
 # Just core (M1 + M2 + M2.5 — parser, directives, math, emoji, XSS, slug, katex)
-yarn workspace @mddeck/core test
+yarn workspace @machine-w/mddeck-core test
 
 # Just CLI (file I/O, config loading, output paths)
-yarn workspace @mddeck/cli test
+yarn workspace @machine-w/mddeck-cli test
 
 # Just VSCode extension (directives definitions, package.json sanity)
 yarn workspace mddeck-vscode test
@@ -107,7 +107,7 @@ Tests       41 passed (41)
 Watch mode for fast iteration on a single package:
 
 ```bash
-yarn workspace @mddeck/core test:watch
+yarn workspace @machine-w/mddeck-core test:watch
 ```
 
 ---
@@ -302,9 +302,9 @@ Before publishing, run through this checklist. Every item should pass:
 
 | ✓ | Test | How |
 |---|---|---|
-| ☐ | Core compiles | `yarn workspace @mddeck/core build` |
-| ☐ | Core tests pass (28) | `yarn workspace @mddeck/core test` |
-| ☐ | CLI builds | `yarn workspace @mddeck/cli build` |
+| ☐ | Core compiles | `yarn workspace @machine-w/mddeck-core build` |
+| ☐ | Core tests pass (28) | `yarn workspace @machine-w/mddeck-core test` |
+| ☐ | CLI builds | `yarn workspace @machine-w/mddeck-cli build` |
 | ☐ | CLI converts HTML | `node packages/cli/bin/mddeck.js examples/basic.md -o /tmp/x.html` |
 | ☐ | CLI converts PDF | `... --pdf -o /tmp/x.pdf` then `file /tmp/x.pdf` |
 | ☐ | CLI watch works | `... --watch` then edit the .md and verify rebuild |
@@ -370,7 +370,7 @@ mddeck: true
 
 Without a marker, the preview falls through to vanilla Markdown.
 
-### Tests fail with "Cannot find module @mddeck/core"
+### Tests fail with "Cannot find module @machine-w/mddeck-core"
 
 You're probably running tests from a stale `node_modules`. Fix:
 

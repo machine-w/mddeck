@@ -8,7 +8,7 @@
  * (used by the PDF flow to know when rendering has finished).
  */
 
-import type { MdDeck } from '@mddeck/core'
+import type { MdDeck } from '@machine-w/mddeck-core'
 import { getImpressJsBundle } from '../../impress-bundle.js'
 
 export interface ImpressTemplateOptions {

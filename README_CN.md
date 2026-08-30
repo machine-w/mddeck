@@ -75,9 +75,9 @@ $ mddeck presentation.md -o slides.html
 ```
 mddeck/
 ├── packages/
-│   ├── core/                # @mddeck/core — 解析器 + 主题 + directives
+│   ├── core/                # @machine-w/mddeck-core — 解析器 + 主题 + directives
 │   │                         （CLI 和 VSCode 扩展依赖的底层库）
-│   ├── cli/                 # @mddeck/cli — `mddeck` 命令
+│   ├── cli/                 # @machine-w/mddeck-cli — `mddeck` 命令
 │   └── vscode/              # mddeck-vscode — VSCode 扩展（计划中）
 ├── examples/                # 现成的 Markdown deck 样例
 └── tsconfig.base.json
@@ -87,8 +87,8 @@ mddeck/
 
 | 包 | 状态 | 说明 |
 |---|---|---|
-| `@mddeck/core` | ✅ v0.1.0 | 核心框架：Markdown → impress.js HTML + CSS |
-| `@mddeck/cli` | ✅ v0.1.0 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
+| `@machine-w/mddeck-core` | ✅ v0.1.0 | 核心框架：Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.0 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
 | `mddeck-vscode` | ✅ v0.1.0 | VSCode 扩展，编辑器内实时预览 |
 
 ---
@@ -98,9 +98,9 @@ mddeck/
 ### 1. 安装 CLI
 
 ```bash
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 # 或
-npx @mddeck/cli --help
+npx @machine-w/mddeck-cli --help
 ```
 
 ### 2. 写 deck
@@ -140,12 +140,12 @@ mddeck presentation.md --watch --server --port 8080
 
 ---
 
-## 通过 `@mddeck/core` 编程使用
+## 通过 `@machine-w/mddeck-core` 编程使用
 
 如果你想把 mddeck 集成到自己的工具里（构建流水线、静态站点生成器、服务端渲染），直接使用库即可：
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({
   theme: 'default',

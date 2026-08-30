@@ -1,7 +1,7 @@
 /**
  * mddeck core unit tests.
  *
- * These tests verify the core behavior of @mddeck/core:
+ * These tests verify the core behavior of @machine-w/mddeck-core:
  *  - Basic rendering of multi-slide markdown
  *  - impress.js data-* attribute injection
  *  - Custom directive handling (position / rotate / scale / ...)

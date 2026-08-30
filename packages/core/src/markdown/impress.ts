@@ -14,7 +14,7 @@
  *
  * The plugin reads the value from `token.meta.marpitDirectives` (already populated
  * by `marpit_directives_apply` upstream in the pipeline). Custom directives defined
- * by `@mddeck/core` (see ./directives.ts) populate that meta object before this
+ * by `@machine-w/mddeck-core` (see ./directives.ts) populate that meta object before this
  * plugin runs.
  */
 

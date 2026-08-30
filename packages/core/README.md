@@ -1,10 +1,10 @@
-# @mddeck/core
+# @machine-w/mddeck-core
 
 > The mddeck parser + theme + directive library.
 >
 > Markdown → impress.js HTML, with no runtime dependencies on a browser.
 
-This is the lower-level library that powers both the `@mddeck/cli`
+This is the lower-level library that powers both the `@machine-w/mddeck-cli`
 command-line tool and the planned `mddeck-vscode` editor extension.
 
 If you're building a custom integration (e.g. embedding mddeck into a
@@ -14,9 +14,9 @@ build pipeline), this is the package you want.
 ## Installation
 
 ```bash
-npm install @mddeck/core
+npm install @machine-w/mddeck-core
 # or in a monorepo
-yarn add @mddeck/core
+yarn add @machine-w/mddeck-core
 ```
 
 **Peer dependencies** (most are optional, only needed for the features
@@ -31,7 +31,7 @@ you use):
 ## Quick start
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const deck = new MdDeck({
   theme: 'gaia',
@@ -162,12 +162,12 @@ full syntax reference (front-matter, directives, math, emoji, XSS).
 
 ## Plugins
 
-`@mddeck/core` is built on top of
+`@machine-w/mddeck-core` is built on top of
 [marpit](https://marpit.marp.app/), the markdown-it-based slide framework.
 You can extend a `MdDeck` instance with any marpit plugin:
 
 ```ts
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 import { someCustomMarpitPlugin } from 'some-package'
 
 const deck = new MdDeck({ theme: 'default' })

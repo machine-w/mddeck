@@ -1,5 +1,5 @@
 /**
- * @mddeck/core compatibility layer for code copied from @marp-team/marp-core.
+ * @machine-w/mddeck-core compatibility layer for code copied from @marp-team/marp-core.
  *
  * The marp-core modules expect two things:
  *   1. `marpPlugin` factory — wrapper for markdown-it plugins that checks

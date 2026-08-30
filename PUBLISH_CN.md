@@ -4,7 +4,7 @@
 > 打包 VS Code 扩展、创建 GitHub Release。
 
 本指南面向**维护者**。假设你拥有 [`machine-w/mddeck`](https://github.com/machine-w/mddeck)
-仓库的 push 权限，并且有一个 npm 账号，对 `@mddeck/*` 命名空间有发布权限
+仓库的 push 权限，并且有一个 npm 账号，对 `@machine-w/*` 命名空间有发布权限
 （以及 VS Code Marketplace 上的 `mddeck` publisher）。
 
 ---
@@ -14,7 +14,7 @@
 1. [Token 安全 —— 必读](#token-安全--必读)
 2. [发布前检查清单](#发布前检查清单)
 3. [GitHub：打 tag + 创建 Release](#github打-tag--创建-release)
-4. [npm：发布 `@mddeck/core` 和 `@mddeck/cli`](#npm发布-mddeckcore-和-mddeckcli)
+4. [npm：发布 `@machine-w/mddeck-core` 和 `@machine-w/mddeck-cli`](#npm发布-mddeckcore-和-mddeckcli)
 5. [VS Code：打包 + 发布 `mddeck-vscode`](#vs-code打包--发布-mddeck-vscode)
 6. [发布后验证](#发布后验证)
 7. [回滚流程](#回滚流程)
@@ -25,7 +25,7 @@
 ## Token 安全 —— 必读
 
 > ⚠️ **绝对不要把真 npm token 提交到 git！** 一旦泄露，任何人都能往
-> `@mddeck/*` 命名空间发布恶意代码。GitHub 会自动吊销泄露的 token，
+> `@machine-w/*` 命名空间发布恶意代码。GitHub 会自动吊销泄露的 token，
 > 但那时候损失已经造成。
 
 仓库已经配置好了让 token 远离源码：
@@ -155,8 +155,8 @@ Release 正文用这个模板（填入空白）：
 
 ### 亮点
 
-- **`@mddeck/core` v0.1.0** —— markdown → impress.js 渲染库
-- **`@mddeck/cli` v0.1.0** —— `mddeck` 命令，支持 HTML / PDF / watch / server
+- **`@machine-w/mddeck-core` v0.1.0** —— markdown → impress.js 渲染库
+- **`@machine-w/mddeck-cli` v0.1.0** —— `mddeck` 命令，支持 HTML / PDF / watch / server
 - **`mddeck-vscode` v0.1.0** —— VS Code 扩展，编辑器内实时预览
 
 ### 功能
@@ -172,9 +172,9 @@ Release 正文用这个模板（填入空白）：
 ### 安装
 
 \`\`\`bash
-npm install --save-dev @mddeck/cli
+npm install --save-dev @machine-w/mddeck-cli
 # 或用 npx
-npx @mddeck/cli presentation.md -o slides.html
+npx @machine-w/mddeck-cli presentation.md -o slides.html
 \`\`\`
 
 ### 完整更新日志
@@ -186,10 +186,10 @@ npx @mddeck/cli presentation.md -o slides.html
 
 ---
 
-## npm：发布 `@mddeck/core` 和 `@mddeck/cli`
+## npm：发布 `@machine-w/mddeck-core` 和 `@machine-w/mddeck-cli`
 
-`@mddeck/core` 是**基础** —— 必须先发，因为 `@mddeck/cli` 依赖它。
-（`mddeck-vscode` 依赖 `@mddeck/cli`，所以应该在 CLI 上 npm **之后**再发布。）
+`@machine-w/mddeck-core` 是**基础** —— 必须先发，因为 `@machine-w/mddeck-cli` 依赖它。
+（`mddeck-vscode` 依赖 `@machine-w/mddeck-cli`，所以应该在 CLI 上 npm **之后**再发布。）
 
 有**三种发布方式**，挑一种：
 
@@ -200,7 +200,7 @@ npx @mddeck/cli presentation.md -o slides.html
 2. 把 `.npmrc.template` 渲染成 `.npmrc`（gitignored, `chmod 600`）
 3. 校验工作区干净、测试通过、版本一致
 4. 编译所有包
-5. 发布 `@mddeck/core`，再发 `@mddeck/cli`
+5. 发布 `@machine-w/mddeck-core`，再发 `@machine-w/mddeck-cli`
 6. 退出时自动清理 `.npmrc`
 
 ```bash
@@ -246,7 +246,7 @@ DRY_RUN=1 NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
    - 校验 3 个 package.json 版本号都匹配输入
    - 跑测试
    - 编译所有包
-   - 用 **provenance** 发布 `@mddeck/core` 然后 `@mddeck/cli`
+   - 用 **provenance** 发布 `@machine-w/mddeck-core` 然后 `@machine-w/mddeck-cli`
    - 在 Summary 里贴出 npm 链接
 
 Token 永远不会出现在日志或仓库源码里 —— 它只在 GitHub 加密的 secret
@@ -261,12 +261,12 @@ npm login --auth-type=legacy
 
 # 2. 确认有发布权限
 npm whoami
-npm access ls-packages @mddeck/core    # 应显示你的用户名
+npm access ls-packages @machine-w/mddeck-core    # 应显示你的用户名
 
-# 3. 把 packages/cli/package.json 里的 @mddeck/core 依赖
+# 3. 把 packages/cli/package.json 里的 @machine-w/mddeck-core 依赖
 #    从 "file:../core" 改成 "^0.1.0"（或你正在发的版本）
 cd packages/cli
-npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
+npm pkg set 'dependencies.@machine-w/mddeck-core'='^0.1.0'
 cd ../..
 
 # 4. 编译 + dry-run
@@ -283,7 +283,7 @@ cd ../cli
 npm publish --access public --provenance
 ```
 
-`--access public` 是 scoped 包（`@mddeck/*`）首次发布必需的选项。
+`--access public` 是 scoped 包（`@machine-w/*`）首次发布必需的选项。
 `--provenance` 附加一个证明该包是从此 commit 构建的 attestation
 （CI 里需要 `id-token: write` 权限，本地跑不需要）。
 
@@ -291,14 +291,14 @@ npm publish --access public --provenance
 
 ```bash
 # 检查包已上 npm
-npm view @mddeck/core
-npm view @mddeck/cli
+npm view @machine-w/mddeck-core
+npm view @machine-w/mddeck-cli
 
 # 在干净目录装一下确认能用
 mkdir /tmp/verify-npm && cd /tmp/verify-npm
 npm init -y
-npm install @mddeck/core @mddeck/cli
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
+npm install @machine-w/mddeck-core @machine-w/mddeck-cli
+node -e "const { MdDeck } = require('@machine-w/mddeck-core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 # → 应打印带 <div class="step"> 的 HTML
 
 # CLI 也试一下
@@ -309,7 +309,7 @@ npx mddeck /path/to/some.md -o /tmp/from-npm.html
 
 ## VS Code：打包 + 发布 `mddeck-vscode`
 
-`mddeck-vscode` 依赖 `@mddeck/cli`（传递依赖 `@mddeck/core`），所以**先要把
+`mddeck-vscode` 依赖 `@machine-w/mddeck-cli`（传递依赖 `@machine-w/mddeck-core`），所以**先要把
 那两个包发到 npm 再做这个**。
 
 ### 前提
@@ -370,10 +370,10 @@ ovsx publish mddeck-vscode-0.1.0.vsix -p mddeck
 # 1. 验证 core + cli from npm
 mkdir /tmp/verify-all && cd /tmp/verify-all
 npm init -y
-npm install @mddeck/core @mddeck/cli
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
+npm install @machine-w/mddeck-core @machine-w/mddeck-cli
+node -e "const { MdDeck } = require('@machine-w/mddeck-core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 
-# 2. 验证 CLI from npm（用安装的 @mddeck/core，不是本地的）
+# 2. 验证 CLI from npm（用安装的 @machine-w/mddeck-core，不是本地的）
 npx mddeck examples/basic.md -o /tmp/from-npm.html
 xdg-open /tmp/from-npm.html
 
@@ -396,8 +396,8 @@ code --install-extension packages/vscode/mddeck-vscode-0.1.0.vsix
 ### 选项 1：unpublish 单个版本（72 小时内）
 
 ```bash
-npm unpublish @mddeck/core@0.1.0 --force
-npm unpublish @mddeck/cli@0.1.0 --force
+npm unpublish @machine-w/mddeck-core@0.1.0 --force
+npm unpublish @machine-w/mddeck-cli@0.1.0 --force
 ```
 
 **警告**：npm 只允许在发布后 72 小时内 unpublish，并且**强烈不推荐**这么做，
@@ -428,8 +428,8 @@ gh release create v0.1.1 --title "..." --notes "..."
 如果想阻止新装但保留给已装的用户：
 
 ```bash
-npm deprecate @mddeck/core@0.1.0 "严重 bug，请升级到 0.1.1"
-npm deprecate @mddeck/cli@0.1.0 "严重 bug，请升级到 0.1.1"
+npm deprecate @machine-w/mddeck-core@0.1.0 "严重 bug，请升级到 0.1.1"
+npm deprecate @machine-w/mddeck-cli@0.1.0 "严重 bug，请升级到 0.1.1"
 ```
 
 VS Code 端，从 Marketplace 后台取消发布：
@@ -443,7 +443,7 @@ VS Code 端，从 Marketplace 后台取消发布：
 
 | 字段 | 值 | 用途 |
 |---|---|---|
-| `name` | `@mddeck/core`、`@mddeck/cli`、`mddeck-vscode` | npm 包名（注意 vscode 没有 scope） |
+| `name` | `@machine-w/mddeck-core`、`@machine-w/mddeck-cli`、`mddeck-vscode` | npm 包名（注意 vscode 没有 scope） |
 | `version` | `X.Y.Z` | SemVer 版本；3 个包必须一致 |
 | `license` | `MIT` | SPDX 协议标识符 |
 | `repository.type` | `"git"` | |
@@ -452,11 +452,11 @@ VS Code 端，从 Marketplace 后台取消发布：
 | `homepage` | `"https://github.com/machine-w/mddeck#readme"` | npm 页面链接 |
 | `engines.node` | `">=18"` | Node 版本要求 |
 
-### `@mddeck/core` 的 `package.json`
+### `@machine-w/mddeck-core` 的 `package.json`
 
 ```json
 {
-  "name": "@mddeck/core",
+  "name": "@machine-w/mddeck-core",
   "version": "0.1.0",
   "description": "Markdown → impress.js slide deck core (parser + theme + directives)",
   "main": "./dist/index.js",
@@ -476,15 +476,15 @@ VS Code 端，从 Marketplace 后台取消发布：
 }
 ```
 
-### `@mddeck/cli` 的 `package.json`
+### `@machine-w/mddeck-cli` 的 `package.json`
 
 ```json
 {
-  "name": "@mddeck/cli",
+  "name": "@machine-w/mddeck-cli",
   "version": "0.1.0",
   "bin": { "mddeck": "./bin/mddeck.js" },
   "dependencies": {
-    "@mddeck/core": "^0.1.0",          // ← 发布时改成 ^X.Y.Z
+    "@machine-w/mddeck-core": "^0.1.0",          // ← 发布时改成 ^X.Y.Z
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.2",
     "express": "^4.21.0",
@@ -507,7 +507,7 @@ VS Code 端，从 Marketplace 后台取消发布：
   "main": "./dist/extension.js",
   "engines": { "vscode": "^1.85.0" },
   "dependencies": {
-    "@mddeck/cli": "^0.1.0"           // ← 发布时改成 ^X.Y.Z
+    "@machine-w/mddeck-cli": "^0.1.0"           // ← 发布时改成 ^X.Y.Z
   }
 }
 ```
@@ -542,8 +542,8 @@ VSCode
 □ vsce publish
 
 验证
-□ npm view @mddeck/core
-□ npm view @mddeck/cli
+□ npm view @machine-w/mddeck-core
+□ npm view @machine-w/mddeck-cli
 □ npx mddeck examples/basic.md -o /tmp/x.html    (浏览器打开)
 □ npx mddeck examples/basic.md --pdf -o /tmp/x.pdf
 □ code --install-extension packages/vscode/mddeck-vscode-*.vsix

@@ -1,7 +1,7 @@
 /**
  * Converter — orchestrates Markdown → HTML/PDF conversion.
  *
- * - HTML output: synchronous render via @mddeck/core + impress template
+ * - HTML output: synchronous render via @machine-w/mddeck-core + impress template
  * - PDF output:  uses puppeteer-core to load the rendered HTML in headless
  *                Chromium, waits for `body.impress-ready`, then calls
  *                page.pdf() with print-mode CSS injected
@@ -10,8 +10,8 @@
 import { writeFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { MdDeck } from '@mddeck/core'
-import type { MdDeckOptions } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
+import type { MdDeckOptions } from '@machine-w/mddeck-core'
 
 import { File } from './file.js'
 import { renderImpressTemplate } from './templates/impress/layout.js'

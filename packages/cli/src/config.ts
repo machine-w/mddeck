@@ -3,7 +3,7 @@
  */
 
 import { cosmiconfig } from 'cosmiconfig'
-import type { MdDeckOptions } from '@mddeck/core'
+import type { MdDeckOptions } from '@machine-w/mddeck-core'
 
 export interface MdDeckConfig {
   /** Default options applied to every deck */

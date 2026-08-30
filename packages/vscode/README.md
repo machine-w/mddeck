@@ -2,7 +2,7 @@
 
 > Live preview of [mddeck](https://github.com/...) slide decks inside VS Code.
 
-This extension integrates the [`@mddeck/core`](../core) parser into VS Code's
+This extension integrates the [`@machine-w/mddeck-core`](../core) parser into VS Code's
 built-in Markdown preview, so you can write Markdown slides and see them as
 an interactive 3D impress.js deck on the right side of your editor.
 
@@ -12,7 +12,7 @@ an interactive 3D impress.js deck on the right side of your editor.
   mddeck front-matter) is rendered as an impress.js deck in the preview
   pane. Standard Markdown files render normally.
 - **Export to HTML / PDF** — `mddeck: Export Slide Deck…` shells out to
-  `@mddeck/cli` to produce a single-file HTML deck or a PDF.
+  `@machine-w/mddeck-cli` to produce a single-file HTML deck or a PDF.
 - **New mddeck file** — `mddeck: New mddeck Markdown File` creates a new
   `.md` file pre-populated with the mddeck template.
 - **Toggle mddeck** — quickly enable/disable mddeck rendering per-file
@@ -95,10 +95,10 @@ the supported markdown features.
 The extension hooks into VS Code's built-in Markdown preview by returning
 a custom `extendMarkdownIt(md)` function. When VS Code opens a preview,
 this function is called; we patch `md.render` to detect mddeck-marked
-files and route them through `@mddeck/core` instead of vanilla markdown.
+files and route them through `@machine-w/mddeck-core` instead of vanilla markdown.
 
 The impress.js runtime is then initialized by the script embedded in the
-generated HTML (see `@mddeck/core`'s `renderDocument`).
+generated HTML (see `@machine-w/mddeck-core`'s `renderDocument`).
 
 ## License
 

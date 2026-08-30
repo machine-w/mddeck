@@ -1,5 +1,5 @@
 {
-  "name": "@mddeck/cli",
+  "name": "@machine-w/mddeck-cli",
   "version": "0.1.0",
   "description": "mddeck CLI — convert Markdown to impress.js slides (HTML / PDF / watch / server)",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mddeck/core": "file:../core",
+    "@machine-w/mddeck-core": "file:../core",
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.2",
     "express": "^4.21.0",

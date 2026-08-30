@@ -1,5 +1,5 @@
 /**
- * @mddeck/core — public entry point.
+ * @machine-w/mddeck-core — public entry point.
  *
  * Exports:
  *   - `MdDeck`            Main class extending Marpit

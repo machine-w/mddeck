@@ -48,7 +48,7 @@ This slide uses **scale: 2**, **x: -1500**, **y: 0**, **z: -2000**, and rotation
 # Code Example
 
 ```typescript
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 
 const md = new MdDeck({ theme: 'gaia' })
 const { html, css } = md.render(markdownSource)

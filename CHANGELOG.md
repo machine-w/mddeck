@@ -38,7 +38,7 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
 
 ### Added
 
-#### `@mddeck/core` (the library)
+#### `@machine-w/mddeck-core` (the library)
 - **`MdDeck` class** extending Marpit with the impress.js output template
 - **impress.js integration plugin** (`mddeck_impress`): rewrites Marpit's
   default `<section>` tokens into `<div class="step" id="step-N" data-x=…>`
@@ -72,7 +72,7 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
 #### Math, emoji, XSS, and markdown extensions (vendored from marp-core)
 - **Math framework** (`$...$` inline, `$$...$$` block) — tokenizes math
   expressions; the renderer is pluggable
-- **KaTeX plugin** (`@mddeck/core/katex`) — synchronous math rendering;
+- **KaTeX plugin** (`@machine-w/mddeck-core/katex`) — synchronous math rendering;
   installed lazily on first render to avoid forcing katex on users who
   don't need math
 - **HTML sanitization** (XSS) using [xss](https://github.com/leizongmin/js-xss)
@@ -86,7 +86,7 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
 - **Auto-scaling** — `<!-- fit -->` headings and code blocks scale to fit
   the slide
 
-#### `@mddeck/cli` (the command-line tool)
+#### `@machine-w/mddeck-cli` (the command-line tool)
 - **`mddeck <input.md> [-o <output>]`** — convert Markdown to HTML
 - **`--pdf`** — convert to PDF using headless Chromium via puppeteer-core
 - **`--watch` / `-w`** — auto-rebuild on file changes
@@ -101,9 +101,9 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
 
 #### `mddeck-vscode` (the VS Code extension)
 - **Live preview** — `extendMarkdownIt` hook that swaps the markdown-it
-  renderer for `@mddeck/core` when the file has a `theme:` front-matter
+  renderer for `@machine-w/mddeck-core` when the file has a `theme:` front-matter
 - **Export command** (`mddeck: Export Slide Deck…`) — shells out to
-  `@mddeck/cli` to produce HTML or PDF
+  `@machine-w/mddeck-cli` to produce HTML or PDF
 - **New file command** (`mddeck: New mddeck Markdown File`) — creates a
   template `.md` file
 - **Toggle command** (`mddeck: Toggle mddeck feature in current Markdown`)

@@ -11,7 +11,7 @@
 
 import * as vscode from 'vscode'
 import type MarkdownIt from 'markdown-it'
-import { MdDeck } from '@mddeck/core'
+import { MdDeck } from '@machine-w/mddeck-core'
 import { themes } from './themes.js'
 
 const mddeckConfig = () => vscode.workspace.getConfiguration('markdown.mddeck')

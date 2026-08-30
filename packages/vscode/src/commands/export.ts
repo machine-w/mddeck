@@ -1,7 +1,7 @@
 /**
  * commands/export.ts — Export Slide Deck command.
  *
- * Opens a save dialog, then shells out to `@mddeck/cli` to do the actual
+ * Opens a save dialog, then shells out to `@machine-w/mddeck-cli` to do the actual
  * rendering. Replaces marp-vscode's `doExport` which called marp-cli.
  */
 
@@ -18,7 +18,7 @@ interface ExportOptions {
 }
 
 /**
- * Run @mddeck/cli via dynamic import. We use the published `marpCli`
+ * Run @machine-w/mddeck-cli via dynamic import. We use the published `marpCli`
  * function (re-exported as `cliInterface` in our package).
  */
 async function runCli(
@@ -26,7 +26,7 @@ async function runCli(
   output: string,
   type: 'html' | 'pdf',
 ): Promise<number> {
-  const { cliInterface } = await import('@mddeck/cli')
+  const { cliInterface } = await import('@machine-w/mddeck-cli')
   // Write markdown to a temp file
   const tmpDir = await import('node:os').then((m) => m.tmpdir())
   const tmpFile = path.join(tmpDir, `mddeck-export-${Date.now()}.md`)

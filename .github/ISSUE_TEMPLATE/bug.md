@@ -36,7 +36,7 @@ PASTE THE OUTPUT OR ERROR HERE
 
 ## Environment
 
-- **mddeck version**: (run `mddeck --version` or check `node_modules/@mddeck/core/package.json`)
+- **mddeck version**: (run `mddeck --version` or check `node_modules/@machine-w/mddeck-core/package.json`)
 - **Node.js version**: (run `node --version`)
 - **OS**: (e.g. macOS 14, Ubuntu 24.04, Windows 11)
 - **Output target**: (HTML / PDF / VSCode preview)

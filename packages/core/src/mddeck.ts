@@ -11,7 +11,7 @@
  *     for PDF export
  *
  * Usage:
- *   import { MdDeck } from '@mddeck/core'
+ *   import { MdDeck } from '@machine-w/mddeck-core'
  *   const md = new MdDeck({ theme: 'default' })
  *   const { html, css } = md.render('# Hello\n---\n# World')
  */
@@ -261,7 +261,7 @@ export class MdDeck extends MarpitBase {
         // Resolve the katex plugin via the package exports map. This works
         // in both vitest (vite-node) and the compiled dist output.
         // @ts-ignore — runtime-only import via package exports
-        const mod = await import('@mddeck/core/plugins_katex/index.js')
+        const mod = await import('@machine-w/mddeck-core/plugins_katex/index.js')
         mod.katexMarpCorePlugin()(this.markdown as any)
       } catch (err) {
         console.warn(

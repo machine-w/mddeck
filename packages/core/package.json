@@ -1,5 +1,5 @@
 {
-  "name": "@mddeck/core",
+  "name": "@machine-w/mddeck-core",
   "version": "0.1.0",
   "description": "Markdown → impress.js slide deck core (parser + theme + directives)",
   "license": "MIT",

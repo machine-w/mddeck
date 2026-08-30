@@ -1,5 +1,5 @@
 /**
- * CLI integration tests — exercise the public API of @mddeck/cli
+ * CLI integration tests — exercise the public API of @machine-w/mddeck-cli
  * (without spawning a subprocess or opening a browser).
  */
 
