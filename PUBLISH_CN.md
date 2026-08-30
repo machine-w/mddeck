@@ -11,14 +11,55 @@
 
 ## 目录
 
-1. [发布前检查清单](#发布前检查清单)
-2. [GitHub：打 tag + 创建 Release](#github打-tag--创建-release)
-3. [npm：发布 `@mddeck/core`](#npm发布-mddeckcore)
-4. [npm：发布 `@mddeck/cli`](#npm发布-mddeckcli)
+1. [Token 安全 —— 必读](#token-安全--必读)
+2. [发布前检查清单](#发布前检查清单)
+3. [GitHub：打 tag + 创建 Release](#github打-tag--创建-release)
+4. [npm：发布 `@mddeck/core` 和 `@mddeck/cli`](#npm发布-mddeckcore-和-mddeckcli)
 5. [VS Code：打包 + 发布 `mddeck-vscode`](#vs-code打包--发布-mddeck-vscode)
 6. [发布后验证](#发布后验证)
 7. [回滚流程](#回滚流程)
 8. [参考：package.json 字段](#参考packagejson-字段)
+
+---
+
+## Token 安全 —— 必读
+
+> ⚠️ **绝对不要把真 npm token 提交到 git！** 一旦泄露，任何人都能往
+> `@mddeck/*` 命名空间发布恶意代码。GitHub 会自动吊销泄露的 token，
+> 但那时候损失已经造成。
+
+仓库已经配置好了让 token 远离源码：
+
+| 文件 / 机制 | 用途 | 是否入库？ |
+|---|---|---|
+| `.npmrc.template` | npm 认证模板，引用 `${NPM_TOKEN}` 环境变量 | ✅ 入库 |
+| `.npmrc` | 真实的 `.npmrc`（从模板渲染） | ❌ gitignored |
+| `scripts/publish.sh` | 一键发布脚本，读取 `NPM_TOKEN` 环境变量 | ✅ 入库 |
+| `.github/workflows/publish.yml` | CI 发布，读取 `secrets.NPM_TOKEN` | ✅ 入库 |
+| `.gitignore` | 排除 `.npmrc` 和 `*.vsix` | ✅ 入库 |
+
+### Token 三个安全位置
+
+| 位置 | 适用场景 | 怎么用 |
+|---|---|---|
+| **Shell 环境变量** | 本地一次性发布 | `export NPM_TOKEN=npm_xxxxx` 然后跑脚本 |
+| **GitHub Actions Secret** | 团队通过 CI 发布 | `Settings → Secrets → Actions → New secret`，名字 `NPM_TOKEN` |
+| **本地 `~/.npmrc`** | 日常本地开发 | `npm login` 自动写入；永远不要入库 |
+
+### 推送前快速安全检查
+
+```bash
+# 确认没有 token 漏到被跟踪的文件里
+git ls-files | xargs grep -lE 'npm_[A-Za-z0-9]{20,}' 2>/dev/null
+# → （无输出 = OK）
+
+# 或用 ripgrep
+rg 'npm_[A-Za-z0-9]{20,}' $(git ls-files)
+# → （无输出 = OK）
+```
+
+万一 token 泄露了：**立刻到 <https://www.npmjs.com/settings/~/tokens> 吊销它**，
+然后生成新的。
 
 ---
 
@@ -37,21 +78,15 @@ yarn build
 yarn test
 
 # 生产代码中没有遗留的 console.log / debugger / TODO
-# （跑 `grep -rn "console.log\|debugger\|TODO" packages/*/src` 审查）
+grep -rn "console.log\|debugger\|TODO" packages/*/src
 ```
 
 ### Git 卫生
 
 ```bash
-# 工作区干净
-git status
-
-# main 分支与 origin 同步
-git fetch origin
-git status   # 应该显示 "Your branch is up to date"
-
-# 没有未提交的变更 / 未跟踪的文件
-git status --short
+git status                          # 工作区干净
+git fetch origin && git status       # main 分支与 origin 同步
+git status --short                  # 没有未提交的变更
 ```
 
 ### 版本号升级
@@ -94,14 +129,9 @@ SemVer 规则：
 ### 1. 打 tag
 
 ```bash
-# 确保 main 分支干净且最新
 git checkout main
 git pull origin main
-
-# 创建 annotated tag
 git tag -a v0.1.0 -m "mddeck v0.1.0 — 首次公开发布"
-
-# 推送 tag
 git push origin v0.1.0
 ```
 
@@ -110,7 +140,6 @@ git push origin v0.1.0
 用 GitHub CLI 一键创建带说明的 release：
 
 ```bash
-# 准备发布说明 —— 从 CHANGELOG.md 复制
 gh release create v0.1.0 \
   --title "mddeck v0.1.0" \
   --notes-file /tmp/release-notes.md \
@@ -157,145 +186,144 @@ npx @mddeck/cli presentation.md -o slides.html
 
 ---
 
-## npm：发布 `@mddeck/core`
+## npm：发布 `@mddeck/core` 和 `@mddeck/cli`
 
-`@mddeck/core` 是**基础** —— 必须先发，因为 `@mddeck/cli` 和
-`mddeck-vscode` 都依赖它。
+`@mddeck/core` 是**基础** —— 必须先发，因为 `@mddeck/cli` 依赖它。
+（`mddeck-vscode` 依赖 `@mddeck/cli`，所以应该在 CLI 上 npm **之后**再发布。）
 
-### 发布前
+有**三种发布方式**，挑一种：
+
+### 方案 A：一键脚本（推荐用于本地发布）
+
+仓库自带 `scripts/publish.sh`，它会：
+1. 从环境变量读 `NPM_TOKEN`
+2. 把 `.npmrc.template` 渲染成 `.npmrc`（gitignored, `chmod 600`）
+3. 校验工作区干净、测试通过、版本一致
+4. 编译所有包
+5. 发布 `@mddeck/core`，再发 `@mddeck/cli`
+6. 退出时自动清理 `.npmrc`
 
 ```bash
-# 确认已登录
-npm login                              # 输入 npm 凭据
+# 方式 1：内联
+NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
 
-# 确认 npm 账号对 @mddeck/* 有发布权限
+# 方式 2：先 export
+export NPM_TOKEN="npm_xxxxxxxxxxxxx"
+yarn publish:all          # 同样调用 scripts/publish.sh
+
+# Dry-run（不真发布，只看会发生什么）
+DRY_RUN=1 NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
+```
+
+脚本会**快速失败**于：
+- 工作区有未提交的变更
+- 任何测试失败
+- 3 个包的版本不一致
+- `yarn build` 失败
+
+> **Token 安全**：脚本把 `.npmrc` 写到磁盘（gitignored, `chmod 600`），
+> 退出时清理。Token **只**从 `NPM_TOKEN` 环境变量读 —— 绝不会写到
+> `.npmrc` 之外的任何地方。
+
+### 方案 B：GitHub Actions（推荐团队发布）
+
+仓库自带 `.github/workflows/publish.yml` —— 一个手动 workflow，
+使用 GitHub Secrets 里的 token 发布到 npm。这是**对团队最安全**的方式。
+
+**一次性配置**：
+
+1. 在 <https://www.npmjs.com/settings/~/tokens> 生成 npm token，勾选
+   `@mddeck` 命名空间的 publish 权限（类型选 **Automation**）
+2. 打开 GitHub 仓库 → **Settings** → **Secrets and variables**
+   → **Actions** → **New repository secret**
+3. Name: `NPM_TOKEN`，Value: 粘贴 token
+
+**每次发布**：
+
+1. 打开 GitHub 仓库 → **Actions** → **Publish** → **Run workflow**
+2. 填入版本号（如 `0.1.0`），可选勾选 "Dry run"
+3. Workflow 会：
+   - 校验 3 个 package.json 版本号都匹配输入
+   - 跑测试
+   - 编译所有包
+   - 用 **provenance** 发布 `@mddeck/core` 然后 `@mddeck/cli`
+   - 在 Summary 里贴出 npm 链接
+
+Token 永远不会出现在日志或仓库源码里 —— 它只在 GitHub 加密的 secret
+存储里。
+
+### 方案 C：手动（需要完全控制时）
+
+```bash
+# 1. 登录（一次性，用 token）
+npm login --auth-type=legacy
+# （或者：echo "$NPM_TOKEN" | npm login --auth-type=legacy --stdin）
+
+# 2. 确认有发布权限
 npm whoami
 npm access ls-packages @mddeck/core    # 应显示你的用户名
-```
 
-### 先 dry-run
+# 3. 把 packages/cli/package.json 里的 @mddeck/core 依赖
+#    从 "file:../core" 改成 "^0.1.0"（或你正在发的版本）
+cd packages/cli
+npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
+cd ../..
 
-```bash
-cd packages/core
-
-# 确保 dist/ 是最新的
+# 4. 编译 + dry-run
 yarn build
-
-# dry-run：查看将要发布的内容（不上传）
-npm publish --dry-run
-
-# 预期输出：
-#   npm notice
-#   package: @mddeck/core@0.1.0
-#   === Tarball Contents ===
-#   ... dist/ 文件 ...
-#   === npm Config ===
-#   ...
-```
-
-### 发布
-
-```bash
 cd packages/core
-npm publish --access public
+npm publish --dry-run --provenance
+cd ../cli
+npm publish --dry-run --provenance
+
+# 5. 发布（按顺序：core 先，cli 后）
+cd packages/core
+npm publish --access public --provenance
+cd ../cli
+npm publish --access public --provenance
 ```
 
-`--access public` 是 scoped 包（`@mddeck/*`）首次发布必需的选项。后续发布
-不需要加。
-
-预期输出：
-
-```
-+ @mddeck/core@0.1.0
-```
+`--access public` 是 scoped 包（`@mddeck/*`）首次发布必需的选项。
+`--provenance` 附加一个证明该包是从此 commit 构建的 attestation
+（CI 里需要 `id-token: write` 权限，本地跑不需要）。
 
 ### 验证
 
 ```bash
 # 检查包已上 npm
 npm view @mddeck/core
+npm view @mddeck/cli
 
-# 在干净目录里装一下确认能用
-mkdir /tmp/verify-core && cd /tmp/verify-core
+# 在干净目录装一下确认能用
+mkdir /tmp/verify-npm && cd /tmp/verify-npm
 npm init -y
-npm install @mddeck/core
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html)"
+npm install @mddeck/core @mddeck/cli
+node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 # → 应打印带 <div class="step"> 的 HTML
-```
 
----
-
-## npm：发布 `@mddeck/cli`
-
-`@mddeck/cli` 依赖 `@mddeck/core`。先发 core，再发 CLI。
-
-### 发布前
-
-```bash
-cd packages/cli
-
-# 把 package.json 里的依赖更新为刚发布的版本（当前是 file:../core）。改成：
-#   "@mddeck/core": "^0.1.0"
-# （或你刚发的任何版本）
-```
-
-或者用 `npm pkg set`：
-
-```bash
-npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
-```
-
-### dry-run
-
-```bash
-cd packages/cli
-yarn build
-npm publish --dry-run
-```
-
-### 发布
-
-```bash
-cd packages/cli
-npm publish --access public
-```
-
-### 验证
-
-```bash
-mkdir /tmp/verify-cli && cd /tmp/verify-cli
-npm install @mddeck/cli
-
-# 构建示例 deck
-node node_modules/.bin/mddeck /path/to/some.md -o /tmp/out.html
-
-# watch 模式
-node node_modules/.bin/mddeck /path/to/some.md --watch -o /tmp/out.html
-
-# server 模式（浏览器打开 localhost:8080）
-node node_modules/.bin/mddeck /path/to/some.md --server
+# CLI 也试一下
+npx mddeck /path/to/some.md -o /tmp/from-npm.html
 ```
 
 ---
 
 ## VS Code：打包 + 发布 `mddeck-vscode`
 
-VS Code 扩展通过 `vsce` 工具发布到 **Visual Studio Marketplace** 和
-**Open VSX Registry**。
+`mddeck-vscode` 依赖 `@mddeck/cli`（传递依赖 `@mddeck/core`），所以**先要把
+那两个包发到 npm 再做这个**。
 
 ### 前提
 
 ```bash
-# 一次性安装 vsce
 npm install -g @vscode/vsce
 
 # 在 https://marketplace.visualstudio.com/ 创建 publisher 账号
-# （用 Microsoft / GitHub 账号，然后注册名为 "mddeck" 的 publisher）
+# （用 Microsoft / GitHub 账号，注册名为 "mddeck" 的 publisher）
 
 # 用 vsce 登录 publisher
 vsce login mddeck
 # （vsce 会提示输入 Personal Access Token，从
-#  https://dev.azure.com → Security → PATs 创建，scope 选 "Marketplace"）
+#  https://dev.azure.com → Security → PATs 创建，scope 选 "Marketplace — Manage"）
 ```
 
 ### 打包 `.vsix`
@@ -324,14 +352,11 @@ vsce publish
 Open VSX 是开源替代品，被部分编辑器使用（Eclipse Theia、Gitpod 等）：
 
 ```bash
-# 安装 ovsx
 npm install -g ovsx
 
-# 用 Open VSX token 登录
 # 在 https://open-vsx.org → 你的账号 → settings 获取 token
 ovsx login <your-token>
 
-# 发布
 ovsx publish mddeck-vscode-0.1.0.vsix -p mddeck
 ```
 
@@ -342,7 +367,7 @@ ovsx publish mddeck-vscode-0.1.0.vsix -p mddeck
 发布完成后，跑**跨渠道冒烟测试**：
 
 ```bash
-# 1. 验证 core from npm
+# 1. 验证 core + cli from npm
 mkdir /tmp/verify-all && cd /tmp/verify-all
 npm init -y
 npm install @mddeck/core @mddeck/cli
@@ -357,8 +382,6 @@ npx mddeck examples/basic.md --pdf -o /tmp/from-npm.pdf
 file /tmp/from-npm.pdf    # → PDF document, version 1.4, 7 page(s)
 
 # 4. VS Code 扩展
-# （手动：在全新的 VS Code profile 里装 .vsix，验证
-#  Markdown 预览能渲染 impress.js deck）
 code --install-extension packages/vscode/mddeck-vscode-0.1.0.vsix
 ```
 
@@ -393,11 +416,10 @@ npm unpublish @mddeck/cli@0.1.0 --force
 # 重新编译 + 测试
 yarn build && yarn test
 
-# 打 tag + 发布
+# 打 tag + 发布（三选一）
 git tag -a v0.1.1 -m "修复 ..."
 git push origin v0.1.1
-npm publish                                  # (在每个包目录)
-vsce publish                                 # (在 vscode 目录)
+NPM_TOKEN="..." yarn publish:all
 gh release create v0.1.1 --title "..." --notes "..."
 ```
 
@@ -495,19 +517,36 @@ VS Code 端，从 Marketplace 后台取消发布：
 ## 速查：一页式清单
 
 ```text
+发布前
 □ yarn build                                            (干净编译)
 □ yarn test                                             (41 个测试通过)
 □ 在 3 个 package.json 里升级版本号                     (semver)
 □ 更新 CHANGELOG.md                                     (一条新记录)
+□ Token 没漏：rg 'npm_[A-Za-z0-9]{20,}' $(git ls-files)
+
+Git
 □ git commit -am "Release v0.1.0"
-□ git tag -a v0.1.0 -m "..."                            (推送 tag)
-□ npm publish (在 packages/core/)                      (--dry-run 先)
-□ npm publish (在 packages/cli/)                       (core 之后)
-□ vsce package + vsce publish (在 packages/vscode/)
-□ gh release create v0.1.0 --notes-file ...            (带 changelog)
-□ 在干净目录验证：npm install + 跑 CLI + PDF
-□ 在全新 VS Code profile 装 .vsix，测试预览
-□ 更新 CHANGELOG.md 加 "Released on YYYY-MM-DD" 链接
+□ git tag -a v0.1.0 -m "..." && git push origin v0.1.0
+□ gh release create v0.1.0 --notes-file ...
+
+npm（三选一）
+□ A) 本地：  NPM_TOKEN="npm_..." yarn publish:all
+□ B) CI：    在 GitHub Secrets 设 NPM_TOKEN → 跑 workflow
+□ C) 手动：  cd packages/core && npm publish --access public --provenance
+            cd packages/cli  && npm publish --access public --provenance
+
+VSCode
+□ npm install -g @vscode/vsce && vsce login mddeck
+□ cd packages/vscode && yarn build
+□ vsce package
+□ vsce publish
+
+验证
+□ npm view @mddeck/core
+□ npm view @mddeck/cli
+□ npx mddeck examples/basic.md -o /tmp/x.html    (浏览器打开)
+□ npx mddeck examples/basic.md --pdf -o /tmp/x.pdf
+□ code --install-extension packages/vscode/mddeck-vscode-*.vsix
 ```
 
 完事，开船。

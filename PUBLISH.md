@@ -13,14 +13,55 @@ the `mddeck-vscode` publisher on the VS Code Marketplace).
 
 ## Table of contents
 
-1. [Pre-release checklist](#pre-release-checklist)
-2. [GitHub: tag & release](#github-tag--release)
-3. [npm: publish `@mddeck/core`](#npm-publish-mddeckcore)
-4. [npm: publish `@mddeck/cli`](#npm-publish-mddeckcli)
+1. [Token safety — read this first](#token-safety--read-this-first)
+2. [Pre-release checklist](#pre-release-checklist)
+3. [GitHub: tag & release](#github-tag--release)
+4. [npm: publish `@mddeck/core` & `@mddeck/cli`](#npm-publish-mddeckcore--mddeckcli)
 5. [VS Code: package & publish `mddeck-vscode`](#vs-code-package--publish-mddeck-vscode)
 6. [Post-release verification](#post-release-verification)
 7. [Rollback procedure](#rollback-procedure)
 8. [Reference: package.json fields](#reference-packagejson-fields)
+
+---
+
+## Token safety — read this first
+
+> ⚠️ **NEVER commit a real npm token to git.** If it leaks, anyone can
+> publish malicious code to the `@mddeck/*` scope. GitHub will auto-revoke
+> leaked tokens, but only after the damage is done.
+
+The repo is configured to keep tokens out of source control:
+
+| File / mechanism | Purpose | Committed? |
+|---|---|---|
+| `.npmrc.template` | npm auth template, references `${NPM_TOKEN}` env var | ✅ yes |
+| `.npmrc` | Real `.npmrc` (rendered from template) | ❌ gitignored |
+| `scripts/publish.sh` | One-shot publish; reads `NPM_TOKEN` env var | ✅ yes |
+| `.github/workflows/publish.yml` | CI publish; reads `secrets.NPM_TOKEN` | ✅ yes |
+| `.gitignore` | Excludes `.npmrc` and `*.vsix` | ✅ yes |
+
+### Three safe places to put your token
+
+| Location | Best for | How |
+|---|---|---|
+| **Shell env var** | Local one-shot publishing | `export NPM_TOKEN=npm_xxxxx` then run the script |
+| **GitHub Actions secret** | Team releases via CI UI | `Settings → Secrets → Actions → New secret`, name `NPM_TOKEN` |
+| **Local `~/.npmrc`** | Day-to-day local development | `npm login` writes this; never commit it |
+
+### Quick safety check before pushing
+
+```bash
+# Make sure no token slipped into a tracked file
+git ls-files | xargs grep -lE 'npm_[A-Za-z0-9]{20,}' 2>/dev/null
+# → (no output = good)
+
+# Or with ripgrep
+rg 'npm_[A-Za-z0-9]{20,}' $(git ls-files)
+# → (no output = good)
+```
+
+If a token ever leaks: **revoke it immediately** at
+<https://www.npmjs.com/settings/machine-w/tokens> and create a new one.
 
 ---
 
@@ -40,21 +81,15 @@ yarn build
 yarn test
 
 # No leftover console.log / debugger / TODO in production code
-# (run `grep -rn "console.log\|debugger\|TODO" packages/*/src` and review)
+grep -rn "console.log\|debugger\|TODO" packages/*/src
 ```
 
 ### Git hygiene
 
 ```bash
-# Working tree is clean
-git status
-
-# main is current with origin
-git fetch origin
-git status   # should say "Your branch is up to date"
-
-# No uncommitted changes / untracked files
-git status --short
+git status                          # working tree clean
+git fetch origin && git status       # main up to date
+git status --short                  # no uncommitted changes
 ```
 
 ### Version bumping
@@ -101,23 +136,15 @@ Marketplace both link back to a tag in this repo.
 ### 1. Tag the release
 
 ```bash
-# Make sure main is clean and current
 git checkout main
 git pull origin main
-
-# Create an annotated tag
 git tag -a v0.1.0 -m "mddeck v0.1.0 — first public release"
-
-# Push the tag
 git push origin v0.1.0
 ```
 
 ### 2. Create a GitHub release
 
-Use the GitHub CLI for a one-shot release with notes:
-
 ```bash
-# Draft release notes — copy from CHANGELOG.md
 gh release create v0.1.0 \
   --title "mddeck v0.1.0" \
   --notes-file /tmp/release-notes.md \
@@ -165,171 +192,138 @@ package descriptions and the VS Code extension page.
 
 ---
 
-## npm: publish `@mddeck/core`
+## npm: publish `@mddeck/core` & `@mddeck/cli`
 
 `@mddeck/core` is the **foundation** — publish it first, because
-`@mddeck/cli` and `mddeck-vscode` depend on it.
+`@mddeck/cli` depends on it. (`mddeck-vscode` depends on `@mddeck/cli`,
+so it should be published *after* the CLI is on npm.)
 
-There are **two ways** to publish. Pick one:
+There are **three ways** to publish. Pick one:
 
 ### Option A: one-shot script (recommended for local publishing)
 
 The repo includes `scripts/publish.sh` which:
 1. Reads `NPM_TOKEN` from the environment
-2. Renders `.npmrc.template` → `.npmrc` (gitignored)
+2. Renders `.npmrc.template` → `.npmrc` (gitignored, `chmod 600`)
 3. Verifies working tree is clean, tests pass, versions match
 4. Builds everything
 5. Publishes `@mddeck/core`, then `@mddeck/cli`
-6. Prints the npm URLs for follow-up
+6. Cleans up `.npmrc` automatically
 
 ```bash
 # Either set it inline:
 NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
 
-# Or export first (the script will pick it up):
+# Or export first:
 export NPM_TOKEN="npm_xxxxxxxxxxxxx"
-yarn publish:all
+yarn publish:all          # same script, called via package.json
 
-# Dry run (no actual publish):
+# Dry run (no actual publish, just check what would happen):
 DRY_RUN=1 NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
 ```
 
-The script will fail-fast if:
+The script will **fail-fast** if:
 - Working tree has uncommitted changes
 - Any test fails
 - The 3 packages have mismatched versions
 - `yarn build` fails
 
 > **Token safety**: the script writes `.npmrc` to disk (gitignored) with
-> `chmod 600`. **Never** put a real token in any committed file.
+> `chmod 600`, and removes it on exit. The token is **only** read from
+> the `NPM_TOKEN` env var — never written to disk outside `.npmrc`.
 
-### Option B: manual (when you want fine-grained control)
+### Option B: GitHub Actions (recommended for team releases)
+
+The repo includes `.github/workflows/publish.yml` — a manual workflow
+that publishes to npm using a token stored in GitHub Secrets. This is
+the **safest option** for teams.
+
+**One-time setup**:
+
+1. Generate an npm token at <https://www.npmjs.com/settings/~/tokens>
+   with publish rights to the `@mddeck` scope (type: **Automation**)
+2. Go to your GitHub repo → **Settings** → **Secrets and variables**
+   → **Actions** → **New repository secret**
+3. Name: `NPM_TOKEN`, Value: paste the token
+
+**Per release**:
+
+1. Go to your GitHub repo → **Actions** → **Publish** → **Run workflow**
+2. Enter the version number (e.g. `0.1.0`); optionally check "Dry run"
+3. The workflow:
+   - Verifies all 3 package.json versions match the input
+   - Runs the test suite
+   - Builds all packages
+   - Publishes `@mddeck/core` then `@mddeck/cli` with **provenance**
+   - Posts a summary with the npm URLs
+
+The token never appears in logs or the repository source — it lives
+only in GitHub's encrypted secret store.
+
+### Option C: manual (when you want full control)
 
 ```bash
-# Ensure you're logged in
-npm login                              # enter your npm credentials
-# OR use a token without logging in:
-# echo "npm_xxxxxxxxxxxxx" | npm login --auth-type=legacy
+# 1. Log in (one-time, uses a token)
+npm login --auth-type=legacy
+# (or: echo "$NPM_TOKEN" | npm login --auth-type=legacy --stdin)
 
-# Verify your npm account has publish rights to @mddeck/*
+# 2. Verify you have publish rights
 npm whoami
 npm access ls-packages @mddeck/core    # should show your username
-```
 
-```bash
-cd packages/core
+# 3. Bump the @mddeck/core dependency in packages/cli/package.json
+#    from "file:../core" to "^0.1.0" (or whatever version you're publishing)
+cd packages/cli
+npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
+cd ../..
 
-# Make sure dist/ is up to date
+# 4. Build & dry-run
 yarn build
-
-# Dry-run: see what would be published WITHOUT actually uploading
-npm publish --dry-run --provenance
-```
-
-Then publish:
-
-```bash
 cd packages/core
+npm publish --dry-run --provenance
+cd ../cli
+npm publish --dry-run --provenance
+
+# 5. Publish (in order: core, then cli)
+cd packages/core
+npm publish --access public --provenance
+cd ../cli
 npm publish --access public --provenance
 ```
 
-`--access public` is required for the first publish of a scoped package
-(`@mddeck/*`). `--provenance` attaches an attestation that the package
-was built from this specific commit (requires `id-token: write`
-permission in CI).
-
-### Option C: GitHub Actions (recommended for CI-driven releases)
-
-The repo includes `.github/workflows/publish.yml`. To use it:
-
-1. Add your npm token to GitHub repo secrets as `NPM_TOKEN`
-   (`Settings → Secrets and variables → Actions → New repository secret`)
-2. Go to `Actions → Publish → Run workflow`
-3. Enter the version number and optionally check "dry run"
-4. The workflow verifies versions, runs tests, builds, then publishes
-
-This is the safest option for teams — the token never leaves GitHub's
-secret store.
+`--access public` is required for the first publish of a scoped
+package. `--provenance` attaches an attestation that the package
+was built from this commit (requires `id-token: write` permission
+in CI, but works locally without it).
 
 ### Verify
 
 ```bash
-# Check the package is on npm
+# Check the packages are on npm
 npm view @mddeck/core
+npm view @mddeck/cli
 
 # Install in a clean directory to confirm it works
-mkdir /tmp/verify-core && cd /tmp/verify-core
+mkdir /tmp/verify-npm && cd /tmp/verify-npm
 npm init -y
-npm install @mddeck/core
-node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html)"
+npm install @mddeck/core @mddeck/cli
+node -e "const { MdDeck } = require('@mddeck/core'); console.log(new MdDeck().render('# Hi').html.slice(0, 60))"
 # → should print HTML with <div class="step">
-```
 
----
-
-## npm: publish `@mddeck/cli`
-
-`@mddeck/cli` depends on `@mddeck/core`. Publish core first, then CLI.
-
-### Pre-flight
-
-```bash
-cd packages/cli
-
-# Update the dependency in package.json to point at the just-published
-# version (currently uses file:../core). Change to:
-#   "@mddeck/core": "^0.1.0"
-# (or whichever version you just published)
-```
-
-Alternatively, use `npm pkg set`:
-
-```bash
-npm pkg set 'dependencies.@mddeck/core'='^0.1.0'
-```
-
-### Dry-run
-
-```bash
-cd packages/cli
-yarn build
-npm publish --dry-run
-```
-
-### Publish
-
-```bash
-cd packages/cli
-npm publish --access public
-```
-
-### Verify
-
-```bash
-mkdir /tmp/verify-cli && cd /tmp/verify-cli
-npm install @mddeck/cli
-
-# Build the example deck
-node node_modules/.bin/mddeck /path/to/some.md -o /tmp/out.html
-
-# Watch mode
-node node_modules/.bin/mddeck /path/to/some.md --watch -o /tmp/out.html
-
-# Server mode (open browser to localhost:8080)
-node node_modules/.bin/mddeck /path/to/some.md --server
+# And the CLI
+npx mddeck /path/to/some.md -o /tmp/from-npm.html
 ```
 
 ---
 
 ## VS Code: package & publish `mddeck-vscode`
 
-The VS Code extension is published to the **Visual Studio Marketplace**
-and **Open VSX Registry** via the `vsce` tool.
+`mddeck-vscode` depends on `@mddeck/cli` (and transitively on
+`@mddeck/core`), so **publish those to npm first**.
 
 ### Prerequisites
 
 ```bash
-# Install vsce once
 npm install -g @vscode/vsce
 
 # Create a publisher account on https://marketplace.visualstudio.com/
@@ -338,7 +332,7 @@ npm install -g @vscode/vsce
 # Login vsce to your publisher
 vsce login mddeck
 # (vsce will prompt for a Personal Access Token from
-#  https://dev.azure.com → Security → PATs, with scope "Marketplace")
+#  https://dev.azure.com → Security → PATs, scope "Marketplace — Manage")
 ```
 
 ### Package the `.vsix`
@@ -369,14 +363,11 @@ Open VSX is the open-source alternative used by some editors
 (Eclipse Theia, Gitpod, etc.):
 
 ```bash
-# Install ovsx
 npm install -g ovsx
 
-# Login with an Open VSX token
 # Get a token at https://open-vsx.org → your account → settings
 ovsx login <your-token>
 
-# Publish
 ovsx publish mddeck-vscode-0.1.0.vsix -p mddeck
 ```
 
@@ -387,7 +378,7 @@ ovsx publish mddeck-vscode-0.1.0.vsix -p mddeck
 After publishing, run the **cross-channel smoke test**:
 
 ```bash
-# 1. Core from npm
+# 1. Core + CLI from npm
 mkdir /tmp/verify-all && cd /tmp/verify-all
 npm init -y
 npm install @mddeck/core @mddeck/cli
@@ -402,8 +393,6 @@ npx mddeck examples/basic.md --pdf -o /tmp/from-npm.pdf
 file /tmp/from-npm.pdf    # → PDF document, version 1.4, 7 page(s)
 
 # 4. VS Code extension
-# (manual: install the .vsix in a fresh VS Code profile and verify
-#  Markdown preview renders the impress.js deck)
 code --install-extension packages/vscode/mddeck-vscode-0.1.0.vsix
 ```
 
@@ -440,11 +429,10 @@ If the bug is minor, fix it and release a patch:
 # Rebuild + test
 yarn build && yarn test
 
-# Tag + publish
+# Tag + publish (any of the 3 options above)
 git tag -a v0.1.1 -m "Fix ..."
 git push origin v0.1.1
-npm publish                                  # (in each package dir)
-vsce publish                                 # (in vscode dir)
+NPM_TOKEN="..." yarn publish:all
 gh release create v0.1.1 --title "..." --notes "..."
 ```
 
@@ -542,19 +530,36 @@ For VS Code, unpublish via the Marketplace UI:
 ## Quick reference: one-page checklist
 
 ```text
+PRE-FLIGHT
 □ yarn build                                            (clean build)
 □ yarn test                                             (41 tests pass)
 □ Bump version in 3 package.json files                 (semver)
 □ Update CHANGELOG.md                                   (one entry)
+□ No token leaked: rg 'npm_[A-Za-z0-9]{20,}' $(git ls-files)
+
+GIT
 □ git commit -am "Release v0.1.0"
-□ git tag -a v0.1.0 -m "..."                            (push tag)
-□ npm publish (in packages/core/)                      (--dry-run first)
-□ npm publish (in packages/cli/)                       (after core)
-□ vsce package + vsce publish (in packages/vscode/)
-□ gh release create v0.1.0 --notes-file ...            (with changelog)
-□ Verify in fresh dir: npm install + run CLI + PDF
-□ Install .vsix in fresh VS Code profile, test preview
-□ Update CHANGELOG.md with "Released on YYYY-MM-DD" link
+□ git tag -a v0.1.0 -m "..." && git push origin v0.1.0
+□ gh release create v0.1.0 --notes-file ...
+
+NPM (pick one of three)
+□ A) Local:    NPM_TOKEN="npm_..." yarn publish:all
+□ B) CI:       set secrets.NPM_TOKEN in GitHub → run workflow
+□ C) Manual:   cd packages/core && npm publish --access public --provenance
+                cd packages/cli  && npm publish --access public --provenance
+
+VSCODE
+□ npm install -g @vscode/vsce && vsce login mddeck
+□ cd packages/vscode && yarn build
+□ vsce package
+□ vsce publish
+
+VERIFY
+□ npm view @mddeck/core
+□ npm view @mddeck/cli
+□ npx mddeck examples/basic.md -o /tmp/x.html    (open in browser)
+□ npx mddeck examples/basic.md --pdf -o /tmp/x.pdf
+□ code --install-extension packages/vscode/mddeck-vscode-*.vsix
 ```
 
 That's it. Ship it.
