@@ -82,6 +82,15 @@ if [[ "${DRY_RUN:-}" == "1" ]]; then
   echo "  - Mode: DRY RUN (no actual publish)"
 fi
 
+# --provenance requires OIDC (only available in CI). Skip it for local runs.
+PROVENANCE_FLAG=""
+if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+  PROVENANCE_FLAG="--provenance"
+  echo "  - Provenance: ENABLED (CI detected)"
+else
+  echo "  - Provenance: disabled (local run — needs OIDC)"
+fi
+
 # ---------- build everything ----------
 echo "→ Building all packages..."
 yarn build
@@ -90,14 +99,14 @@ yarn build
 echo ""
 echo "→ Publishing @mddeck/core@$CORE_VERSION ..."
 cd packages/core
-npm publish --access public $DRY_RUN_FLAG
+npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
 cd "$REPO_ROOT"
 
 # ---------- publish @mddeck/cli ----------
 echo ""
 echo "→ Publishing @mddeck/cli@$CLI_VERSION ..."
 cd packages/cli
-npm publish --access public $DRY_RUN_FLAG
+npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
 cd "$REPO_ROOT"
 
 # ---------- done ----------
