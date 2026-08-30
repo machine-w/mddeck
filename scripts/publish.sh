@@ -80,6 +80,9 @@ fi
 CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
 CLI_VERSION=$(node -p "require('./packages/cli/package.json').version")
 VSCODE_VERSION=$(node -p "require('./packages/vscode/package.json').version")
+CORE_NAME=$(node -p "require('./packages/core/package.json').name")
+CLI_NAME=$(node -p "require('./packages/cli/package.json').name")
+VSCODE_NAME=$(node -p "require('./packages/vscode/package.json').name")
 
 if [[ "$CORE_VERSION" != "$CLI_VERSION" || "$CORE_VERSION" != "$VSCODE_VERSION" ]]; then
   echo "::error::Version mismatch:"
@@ -125,8 +128,8 @@ cd "$REPO_ROOT"
 # ---------- done ----------
 echo ""
 echo "✓ All packages published."
-echo "  - https://www.npmjs.com/package/@mddeck/core"
-echo "  - https://www.npmjs.com/package/@mddeck/cli"
+echo "  - https://www.npmjs.com/package/${CORE_NAME}"
+echo "  - https://www.npmjs.com/package/${CLI_NAME}"
 echo ""
 echo "Next: publish the VS Code extension with:"
 echo "  cd packages/vscode && vsce publish"
