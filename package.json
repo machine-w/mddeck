@@ -14,7 +14,8 @@
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "lint": "eslint \"packages/*/src/**/*.ts\"",
-    "format": "prettier --write \"packages/*/src/**/*.{ts,js,json,scss,md}\""
+    "format": "prettier --write \"packages/*/src/**/*.{ts,js,json,scss,md}\"",
+    "publish:all": "bash scripts/publish.sh"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

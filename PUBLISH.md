@@ -170,18 +170,51 @@ package descriptions and the VS Code extension page.
 `@mddeck/core` is the **foundation** — publish it first, because
 `@mddeck/cli` and `mddeck-vscode` depend on it.
 
-### Pre-flight
+There are **two ways** to publish. Pick one:
+
+### Option A: one-shot script (recommended for local publishing)
+
+The repo includes `scripts/publish.sh` which:
+1. Reads `NPM_TOKEN` from the environment
+2. Renders `.npmrc.template` → `.npmrc` (gitignored)
+3. Verifies working tree is clean, tests pass, versions match
+4. Builds everything
+5. Publishes `@mddeck/core`, then `@mddeck/cli`
+6. Prints the npm URLs for follow-up
+
+```bash
+# Either set it inline:
+NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
+
+# Or export first (the script will pick it up):
+export NPM_TOKEN="npm_xxxxxxxxxxxxx"
+yarn publish:all
+
+# Dry run (no actual publish):
+DRY_RUN=1 NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
+```
+
+The script will fail-fast if:
+- Working tree has uncommitted changes
+- Any test fails
+- The 3 packages have mismatched versions
+- `yarn build` fails
+
+> **Token safety**: the script writes `.npmrc` to disk (gitignored) with
+> `chmod 600`. **Never** put a real token in any committed file.
+
+### Option B: manual (when you want fine-grained control)
 
 ```bash
 # Ensure you're logged in
 npm login                              # enter your npm credentials
+# OR use a token without logging in:
+# echo "npm_xxxxxxxxxxxxx" | npm login --auth-type=legacy
 
 # Verify your npm account has publish rights to @mddeck/*
 npm whoami
 npm access ls-packages @mddeck/core    # should show your username
 ```
-
-### Dry-run first
 
 ```bash
 cd packages/core
@@ -190,32 +223,33 @@ cd packages/core
 yarn build
 
 # Dry-run: see what would be published WITHOUT actually uploading
-npm publish --dry-run
-
-# Expected output:
-#   npm notice
-#   package: @mddeck/core@0.1.0
-#   === Tarball Contents ===
-#   ... dist/ files ...
-#   === npm Config ===
-#   ...
+npm publish --dry-run --provenance
 ```
 
-### Publish
+Then publish:
 
 ```bash
 cd packages/core
-npm publish --access public
+npm publish --access public --provenance
 ```
 
 `--access public` is required for the first publish of a scoped package
-(`@mddeck/*`). Subsequent publishes don't need it.
+(`@mddeck/*`). `--provenance` attaches an attestation that the package
+was built from this specific commit (requires `id-token: write`
+permission in CI).
 
-Expected output:
+### Option C: GitHub Actions (recommended for CI-driven releases)
 
-```
-+ @mddeck/core@0.1.0
-```
+The repo includes `.github/workflows/publish.yml`. To use it:
+
+1. Add your npm token to GitHub repo secrets as `NPM_TOKEN`
+   (`Settings → Secrets and variables → Actions → New repository secret`)
+2. Go to `Actions → Publish → Run workflow`
+3. Enter the version number and optionally check "dry run"
+4. The workflow verifies versions, runs tests, builds, then publishes
+
+This is the safest option for teams — the token never leaves GitHub's
+secret store.
 
 ### Verify
 

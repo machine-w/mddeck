@@ -1,0 +1,97 @@
+name: Publish
+
+# Manually-triggered workflow that publishes the @mddeck/* packages to
+# the npm registry. Reads NPM_TOKEN from the GitHub Actions secret store.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      version:
+        description: 'Version to publish (e.g. 0.1.0). Must match all 3 package.json files.'
+        required: true
+        default: '0.1.0'
+        type: string
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for npm provenance attestation
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history is needed for provenance / version tagging
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          # Token is auto-injected as NODE_AUTH_TOKEN; we also pass it as
+          # NPM_TOKEN for the publish script.
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Verify version matches
+        run: |
+          CORE=$(node -p "require('./packages/core/package.json').version")
+          CLI=$(node -p "require('./packages/cli/package.json').version")
+          VSCODE=$(node -p "require('./packages/vscode/package.json').version")
+          EXPECTED="${{ inputs.version }}"
+          for pkg in "$CORE" "$CLI" "$VSCODE"; do
+            if [[ "$pkg" != "$EXPECTED" ]]; then
+              echo "::error::Expected version $EXPECTED but found $pkg"
+              exit 1
+            fi
+          done
+          echo "All packages at version $EXPECTED"
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Build all packages
+        run: yarn build
+
+      - name: Publish @mddeck/core
+        working-directory: packages/core
+        run: |
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            npm publish --access public --dry-run
+          else
+            npm publish --access public --provenance
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @mddeck/cli
+        working-directory: packages/cli
+        run: |
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            npm publish --access public --dry-run
+          else
+            npm publish --access public --provenance
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Summary
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          echo "## :rocket: Published to npm" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [@mddeck/core@${{ inputs.version }}](https://www.npmjs.com/package/@mddeck/core/v/${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [@mddeck/cli@${{ inputs.version }}](https://www.npmjs.com/package/@mddeck/cli/v/${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY

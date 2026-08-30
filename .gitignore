@@ -16,3 +16,10 @@ examples/*.html
 examples/*.pdf
 examples/screenshots/
 examples/screenshots-m2/
+
+# npm publish credentials — generated from .npmrc.template by scripts/publish.sh
+.npmrc
+
+# vsce/vsx publish artifacts
+*.vsix
+

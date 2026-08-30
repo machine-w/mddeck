@@ -1,0 +1,25 @@
+# mddeck — npm publish configuration
+#
+# This file is a TEMPLATE. To publish, copy it to .npmrc (which is .gitignored)
+# and substitute the actual token via the NPM_TOKEN environment variable.
+#
+# USAGE:
+#   export NPM_TOKEN="npm_xxxxxxxxxxxxx"
+#   npm run publish:all
+# OR:
+#   NPM_TOKEN="npm_xxxxxxxxxxxxx" bash scripts/publish.sh
+#
+# DO NOT COMMIT A FILE WITH A REAL TOKEN.
+
+# npm registry authentication
+# Reads token from NPM_TOKEN env var (set by your shell or CI secret store)
+//registry.npmjs.org/:_authToken=${NPM_TOKEN}
+
+# Sign commits published to npm (provenance attestation, npm 9.5+)
+provenance=true
+
+# Save exact versions in package-lock.json on `npm install`
+save-exact=true
+
+# Always include the @mddeck/* scope in `npm install @mddeck/...` (default in npm 7+)
+@mddeck:registry=https://registry.npmjs.org/
