@@ -18,12 +18,13 @@
     "publish:all": "bash scripts/publish.sh"
   },
   "devDependencies": {
+    "@machine-w/mddeck-cli": "0.1.0",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "4.1.11"
   }
 }
