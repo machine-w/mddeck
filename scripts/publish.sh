@@ -42,7 +42,25 @@ if [[ ! -f .npmrc.template ]]; then
   exit 1
 fi
 echo "→ Writing .npmrc from template (gitignored)..."
-sed "s|\${NPM_TOKEN}|${NPM_TOKEN}|" .npmrc.template > .npmrc
+
+# Inject the real token into the rendered .npmrc. The provenance line is
+# added conditionally based on whether we're in a CI environment (which
+# has OIDC) — local runs must NOT have it on, or npm will fail with
+# "Automatic provenance generation not supported for provider: null".
+PROVENANCE_LINE=""
+if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+  PROVENANCE_LINE="provenance=true"
+  PROVENANCE_FLAG="--provenance"
+  echo "  - Provenance: ENABLED (CI detected)"
+else
+  PROVENANCE_FLAG=""
+  echo "  - Provenance: disabled (local run — needs OIDC)"
+fi
+
+# Substitute ${NPM_TOKEN} and inject / remove the provenance line.
+sed -e "s|\${NPM_TOKEN}|${NPM_TOKEN}|" \
+    -e "s|^provenance=.*|${PROVENANCE_LINE}|" \
+    .npmrc.template > .npmrc
 chmod 600 .npmrc
 
 # ---------- pre-publish sanity checks ----------
@@ -82,14 +100,9 @@ if [[ "${DRY_RUN:-}" == "1" ]]; then
   echo "  - Mode: DRY RUN (no actual publish)"
 fi
 
-# --provenance requires OIDC (only available in CI). Skip it for local runs.
-PROVENANCE_FLAG=""
-if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
-  PROVENANCE_FLAG="--provenance"
-  echo "  - Provenance: ENABLED (CI detected)"
-else
-  echo "  - Provenance: disabled (local run — needs OIDC)"
-fi
+# PROVENANCE_FLAG is set above (when we render .npmrc). When in CI it's
+# set to --provenance; on local runs it's empty so npm doesn't try to
+# generate provenance without OIDC and fail.
 
 # ---------- build everything ----------
 echo "→ Building all packages..."
