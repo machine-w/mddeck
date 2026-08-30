@@ -111,18 +111,46 @@ fi
 echo "→ Building all packages..."
 yarn build
 
-# ---------- publish @mddeck/core ----------
+# ---------- publish @machine-w/mddeck-core ----------
 echo ""
-echo "→ Publishing @mddeck/core@$CORE_VERSION ..."
+echo "→ Publishing ${CORE_NAME}@$CORE_VERSION ..."
 cd packages/core
 npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
 cd "$REPO_ROOT"
 
-# ---------- publish @mddeck/cli ----------
+# ---------- publish @machine-w/mddeck-cli ----------
+#
+# CRITICAL: the published cli cannot depend on `"file:../core"` because
+# `file:` paths only resolve inside the monorepo. Before publishing, swap
+# the dependency for the version we just published, then restore the
+# `file:` form afterwards so the monorepo keeps working.
 echo ""
-echo "→ Publishing @mddeck/cli@$CLI_VERSION ..."
+echo "→ Publishing ${CLI_NAME}@$CLI_VERSION ..."
 cd packages/cli
-npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
+
+CLI_PKG=package.json
+ORIGINAL_DEP=$(node -p "require('./$CLI_PKG').dependencies['@machine-w/mddeck-core'] || ''")
+echo "  - Original @machine-w/mddeck-core dep in cli: $ORIGINAL_DEP"
+
+# If the dependency is file:..., temporarily switch it to the version
+# we just published, publish, then restore.
+if [[ "$ORIGINAL_DEP" == file:* ]]; then
+  echo "  - Temporarily setting @machine-w/mddeck-core to ^$CORE_VERSION for publish"
+  npm pkg set "dependencies.@machine-w/mddeck-core=^$CORE_VERSION"
+
+  # Publish
+  npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
+  PUBLISH_EXIT=$?
+
+  # Restore the original (file:../core) so the monorepo keeps working
+  echo "  - Restoring @machine-w/mddeck-core dep to $ORIGINAL_DEP"
+  npm pkg set "dependencies.@machine-w/mddeck-core=$ORIGINAL_DEP"
+
+  exit $PUBLISH_EXIT
+else
+  # Already a semver range — just publish
+  npm publish --access public $DRY_RUN_FLAG $PROVENANCE_FLAG
+fi
 cd "$REPO_ROOT"
 
 # ---------- done ----------
