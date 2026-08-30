@@ -1,7 +1,7 @@
 {
   "name": "mddeck-vscode",
   "displayName": "mddeck for VS Code",
-  "publisher": "mddeck",
+  "publisher": "machine-w",
   "version": "0.1.3",
   "description": "Create 3D slide decks written in mddeck Markdown on VS Code",
   "license": "MIT",
