@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs of the same workflow when a new commit is pushed
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+
+      - name: Install system dependencies (Chromium for PDF tests)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            chromium-browser \
+            fonts-liberation \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libx11-xcb1 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxrandr2 \
+            libgbm1 \
+            libxss1 \
+            libasound2
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type-check & build
+        run: yarn build
+
+      - name: Run unit tests
+        run: yarn test
+
+      - name: Smoke test: build the example deck
+        run: |
+          node packages/cli/bin/mddeck.js examples/basic.md -o /tmp/basic.html
+          file /tmp/basic.html | grep -q "HTML document" || (echo "::error::basic.html is not a valid HTML document" && exit 1)
+
+      - name: Smoke test: PDF rendering
+        run: |
+          node packages/cli/bin/mddeck.js examples/basic.md --pdf -o /tmp/basic.pdf
+          file /tmp/basic.pdf | grep -q "PDF document" || (echo "::error::basic.pdf is not a valid PDF document" && exit 1)
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-${{ matrix.node }}
+          path: |
+            /tmp/basic.html
+            /tmp/basic.pdf
+          if-no-files-found: ignore
+          retention-days: 3
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: TypeScript check (no emit)
+        run: |
+          for pkg in packages/*/tsconfig.json; do
+            npx tsc -p "$pkg" --noEmit
+          done
+      # Note: ESLint is configured in package.json but `yarn lint` is not
+      # currently wired in — uncomment the line below once ESLint is fully
+      # configured in each workspace package.
+      # - run: yarn lint
