@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM"],
-    "types": ["vscode", "node"],
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -20,11 +20,6 @@
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
     "noImplicitAny": false,
-    "strictNullChecks": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "composite": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules"]
+    "strictNullChecks": true
+  }
 }

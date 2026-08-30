@@ -4,6 +4,9 @@
   "description": "mddeck CLI — convert Markdown to impress.js slides (HTML / PDF / watch / server)",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
   "bin": {
     "mddeck": "./bin/mddeck.js"
   },

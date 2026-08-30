@@ -2,7 +2,7 @@
 
 > Live preview of [mddeck](https://github.com/...) slide decks inside VS Code.
 
-This extension integrates the [`@machine-w/mddeck-core`](../core) parser into VS Code's
+This extension integrates the [`@machine-w/mddeck-core`](https://github.com/machine-w/mddeck/tree/main/packages/core) parser into VS Code's
 built-in Markdown preview, so you can write Markdown slides and see them as
 an interactive 3D impress.js deck on the right side of your editor.
 
@@ -76,7 +76,7 @@ All settings are under the `markdown.mddeck.*` namespace.
 
 ## Markdown syntax
 
-See the [CLI README](../cli/README.md#slide-syntax) for the full syntax
+See the [CLI README](https://github.com/machine-w/mddeck/tree/main/packages/cli/README.md#slide-syntax) for the full syntax
 reference — front-matter, slide separators, 3D positioning directives, and
 the supported markdown features.
 
