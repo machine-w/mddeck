@@ -1,0 +1,19 @@
+@use 'sass:meta';
+@include meta.load-css('pkg:katex/dist/katex.min.css');
+
+.katex-display {
+  margin: 0;
+}
+
+.katex {
+  /**
+   * Chrome browser may not render a symbol with .op-symbol class due to
+   * relative positioning for the inline element.
+   *
+   * https://github.com/marp-team/marp-vscode/issues/393
+   */
+  .delimcenter,
+  .op-symbol {
+    display: inline-block;
+  }
+}

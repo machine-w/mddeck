@@ -1,0 +1,167 @@
+{
+  "name": "mddeck-vscode",
+  "displayName": "mddeck for VS Code",
+  "publisher": "mddeck",
+  "version": "0.1.0",
+  "description": "Create 3D slide decks written in mddeck Markdown on VS Code",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "browser": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Workspace trust is required for exporting slide deck, and using themes configured in the workspace.",
+      "restrictedConfigurations": [
+        "markdown.mddeck.html",
+        "markdown.mddeck.enableHtml",
+        "markdown.mddeck.themes"
+      ]
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "colors": [
+      {
+        "id": "mddeck.directiveKeyForeground",
+        "description": "Foreground decoration color for the key of mddeck directive",
+        "defaults": {
+          "dark": "#67b8e3ff",
+          "light": "#0288d1ff",
+          "highContrast": "#67b8e3ff"
+        }
+      }
+    ],
+    "commands": [
+      {
+        "category": "mddeck",
+        "command": "markdown.mddeck.export",
+        "title": "Export Slide Deck..."
+      },
+      {
+        "category": "mddeck",
+        "command": "markdown.mddeck.newMddeckMarkdown",
+        "title": "New mddeck Markdown File"
+      },
+      {
+        "category": "mddeck",
+        "command": "markdown.mddeck.openExtensionsSettings",
+        "title": "Open mddeck Extension Settings"
+      },
+      {
+        "category": "mddeck",
+        "command": "markdown.mddeck.showQuickPick",
+        "title": "mddeck: Show All Commands..."
+      },
+      {
+        "category": "mddeck",
+        "command": "markdown.mddeck.toggleMddeckFeature",
+        "title": "mddeck: Toggle mddeck feature in current Markdown"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "markdown.mddeck.showQuickPick",
+          "group": "navigation",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "file/newFile": [
+        {
+          "command": "markdown.mddeck.newMddeckMarkdown",
+          "group": "file"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "mddeck",
+      "properties": {
+        "markdown.mddeck.breaks": {
+          "type": "string",
+          "enum": [
+            "off",
+            "on",
+            "inherit"
+          ],
+          "default": "inherit",
+          "description": "Render line breaks as <br> in Markdown."
+        },
+        "markdown.mddeck.html": {
+          "type": "string",
+          "enum": [
+            "off",
+            "default",
+            "all"
+          ],
+          "default": "default",
+          "description": "Whether to render raw HTML in Markdown. 'all' is allowed only in trusted workspaces."
+        },
+        "markdown.mddeck.enableHtml": {
+          "type": "boolean",
+          "default": true,
+          "deprecated": true,
+          "description": "Deprecated: use markdown.mddeck.html instead."
+        },
+        "markdown.mddeck.mathTypesetting": {
+          "type": "string",
+          "enum": [
+            "off",
+            "katex",
+            "mathjax"
+          ],
+          "default": "katex",
+          "description": "Default math engine for math rendering."
+        },
+        "markdown.mddeck.themes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Custom theme CSS files (relative paths or URLs). Workspace trust required."
+        },
+        "markdown.mddeck.exportType": {
+          "type": "string",
+          "enum": [
+            "html",
+            "pdf"
+          ],
+          "default": "html",
+          "description": "Default export format when using the Export command."
+        },
+        "markdown.mddeck.exportAutoOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open the exported file after export completes."
+        }
+      }
+    },
+    "markdown.markdownItPlugins": true,
+    "markdown.previewScripts": [
+      "./media/preview.js"
+    ],
+    "markdown.previewStyles": [
+      "./media/mddeck-vscode.css"
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@mddeck/cli": "file:../cli"
+  },
+  "devDependencies": {
+    "@types/vscode": "1.85.0",
+    "typescript": "^5.4.5",
+    "vitest": "1.6.0"
+  }
+}

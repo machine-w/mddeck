@@ -1,0 +1,32 @@
+/*
+ * mddeck-vscode.css — global styles injected into VS Code's Markdown
+ * preview panel. Mirrors the scaffold CSS from @mddeck/core but adds
+ * VS Code-specific overrides.
+ */
+
+:root {
+  --mddeck-vscode-bg: var(--vscode-editor-background);
+  --mddeck-vscode-fg: var(--vscode-editor-foreground);
+}
+
+#__mddeck-style + div,
+.step {
+  /* Adapt step colors to VS Code's theme */
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+}
+
+.step {
+  font-size: 28px;
+  line-height: 1.5;
+  border: 1px solid var(--vscode-editorWidget-border, transparent);
+}
+
+.step.active,
+.step.present {
+  opacity: 1;
+}
+.step.future,
+.step.past {
+  opacity: 0.4;
+}

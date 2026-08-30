@@ -1,0 +1,18 @@
+node_modules/
+dist/
+build/
+lib/
+*.tsbuildinfo
+.DS_Store
+*.log
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*
+.vscode/
+.idea/
+
+# Generated example outputs
+examples/*.html
+examples/*.pdf
+examples/screenshots/
+examples/screenshots-m2/

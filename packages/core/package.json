@@ -1,0 +1,56 @@
+{
+  "name": "@mddeck/core",
+  "version": "0.1.0",
+  "description": "Markdown → impress.js slide deck core (parser + theme + directives)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./dist/browser.js",
+      "types": "./dist/browser.d.ts"
+    },
+    "./katex": {
+      "import": "./dist/plugins_katex/index.js",
+      "types": "./dist/plugins_katex/index.d.ts"
+    },
+    "./mathjax": {
+      "import": "./dist/plugins_mathjax/index.js",
+      "types": "./dist/plugins_mathjax/index.d.ts"
+    },
+    "./plugins_katex/index.js": "./dist/plugins_katex/index.js",
+    "./plugins_mathjax/index.js": "./dist/plugins_mathjax/index.js",
+    "./themes/*": "./dist/themes/*.css"
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@marp-team/marpit": "^3.2.2",
+    "@twemoji/api": "^17.0.3",
+    "emoji-regex": "^10.6.0",
+    "github-slugger": "^2.0.0",
+    "js-yaml": "^4.1.0",
+    "katex": "^0.18.4",
+    "markdown-it": "^14.1.0",
+    "markdown-it-emoji": "^3.1.0",
+    "postcss": "^8.5.26",
+    "self-closing-tags": "^1.0.1",
+    "twemoji": "^14.0.2",
+    "twemoji-parser": "^14.0.0",
+    "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  }
+}
