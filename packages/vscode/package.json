@@ -1,8 +1,8 @@
 {
-  "name": "mddeck-impress",
+  "name": "mddeck-vscode",
   "displayName": "mddeck — 3D Markdown Slides",
   "publisher": "machine-w",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Create 3D slide decks written in mddeck Markdown on VS Code",
   "license": "MIT",
   "repository": {
