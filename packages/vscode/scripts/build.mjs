@@ -28,42 +28,42 @@ await build({
     'import.meta.url': 'globalThis.importMetaURL',
   },
   // esbuild plugin: intercept `require('@marp-team/marpit/plugin')` and
-  // resolve to the on-disk plugin.js file, then return the file contents
-  // as a CommonJS module. This works around the fact that
-  // @marp-team/marpit has no `exports` field for the `/plugin` subpath
-  // (esbuild won't inline it as part of the bundle).
+  // resolve to the on-disk plugin.js file. We use onResolve + onLoad
+  // so esbuild can statically bundle the CJS file. This works around
+  // the fact that @marp-team/marpit has no `exports` field for the
+  // `/plugin` subpath, and esbuild's alias field alone wasn't enough
+  // for the dynamic require() that our vendored modules use.
   plugins: [
     {
       name: 'marpit-plugin-inline',
       setup(build) {
-        build.onResolve({ filter: /@marp-team\/marpit\/plugin$/ }, () => ({
-          path: resolve(
-            __dirname,
-            '..',
-            '..',
-            '..',
-            'node_modules',
-            '@marp-team',
-            'marpit',
-            'plugin.js',
-          ),
-        }))
-        // Also handle the case where the source uses
-        // `import * as marpit from '@marp-team/marpit'` and pulls
-        // marpPlugin off the namespace.
-        build.onResolve({ filter: /@marp-team\/marpit\/lib\/plugin$/ }, () => ({
-          path: resolve(
-            __dirname,
-            '..',
-            '..',
-            '..',
-            'node_modules',
-            '@marp-team',
-            'marpit',
-            'lib',
-            'plugin.js',
-          ),
-        }))
+        build.onResolve(
+          { filter: /^@marp-team\/marpit\/plugin$/ },
+          () => ({
+            path: resolve(
+              __dirname,
+              '..',
+              '..',
+              '..',
+              'node_modules',
+              '@marp-team',
+              'marpit',
+              'plugin.js',
+            ),
+            namespace: 'file',
+          }),
+        )
+        // Pre-load the plugin.js content as a CommonJS module so its
+        // `module.exports = require('./lib/plugin')` is also bundled
+        // (lib/plugin is the actual marpPlugin factory).
+        build.onLoad(
+          { filter: /marpit[\\\/]plugin\.js$/, namespace: 'file' },
+          async (args) => {
+            const fs = await import('node:fs/promises')
+            const contents = await fs.readFile(args.path, 'utf8')
+            return { contents, loader: 'js' }
+          },
+        )
       },
     },
   ],
