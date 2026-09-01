@@ -12,10 +12,14 @@
  */
 
 import type { Marpit as MarpitType } from '@marp-team/marpit'
-import { marpPlugin as marpitPluginFn } from '@marp-team/marpit/plugin'
-
-// marpitPlugin (re-export from marpit)
-export const marpPlugin = (marpitPluginFn.default ?? marpitPluginFn) as <P extends any[]>(
+// The @marp-team/marpit package.json has no `exports` field for the
+// `/plugin` subpath, and esbuild won't inline dynamic require()s in a
+// CJS bundle (the .vsix ships no node_modules to resolve them at
+// runtime). Import the package's main entry instead and pick out the
+// already-exported `marpPlugin` symbol.
+import * as marpit from '@marp-team/marpit'
+const marpPluginFn = (marpit as any).marpPlugin ?? (marpit as any).default?.marpPlugin
+export const marpPlugin = marpPluginFn as <P extends any[]>(
   plugin: (...args: any[]) => any,
 ) => (...args: any[]) => any
 
