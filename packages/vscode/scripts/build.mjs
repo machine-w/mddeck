@@ -20,7 +20,7 @@ const root = resolve(__dirname, '..')
 await build({
   entryPoints: [resolve(root, 'src/extension.ts')],
   bundle: true,
-  format: 'esm',
+  format: 'cjs',
   target: 'es2022',
   platform: 'node',
   outfile: resolve(root, 'dist/extension.js'),

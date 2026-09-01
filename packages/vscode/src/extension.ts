@@ -9,7 +9,7 @@
 
 import * as vscode from 'vscode'
 
-import { mddeckCoreOptionForPreview } from './option.bundled.js'
+import { mddeckCoreOptionForPreview } from './option.js'
 import { themes } from './themes.js'
 import {
   exportCommand,
