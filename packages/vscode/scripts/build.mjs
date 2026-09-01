@@ -25,13 +25,26 @@ await build({
   platform: 'node',
   outfile: resolve(root, 'dist/extension.js'),
   sourcemap: true,
-  // CJS bundle: `import.meta` is `{}`, so `import.meta.url` is undefined
-  // and `createRequire(import.meta.url)` throws. @mddeck/core's vendored
-  // modules use this pattern. Replace `import.meta.url` with a file://
-  // URL pointing at the bundle's directory so the marpit CJS sub-paths
-  // resolve correctly at extension-host runtime.
+  // In a CJS bundle, `import.meta` is `{}`, so `import.meta.url` is
+  // undefined. Three modules in @mddeck/core use
+  // `createRequire(import.meta.url)` to load CJS sub-paths; without a
+  // valid file:// URL they throw "filename must be a file URL object,
+  // file URL string, or absolute path string".
+  //
+  // esbuild's `define` only accepts JSON or identifier values, so we
+  // can't use a runtime expression. Instead, we polyfill
+  // `import.meta` via a banner that captures the bundle's own
+  // __filename and exposes it through `globalThis.importMetaURL`.
+  // The vendored modules' `import.meta.url` then reads
+  // `globalThis.importMetaURL` via esbuild's identifier replacement.
+  banner: {
+    js: [
+      "var __import_meta_url__ = require('url').pathToFileURL(__filename).href;",
+      "globalThis.importMetaURL = __import_meta_url__;",
+    ].join("\n"),
+  },
   define: {
-    'import.meta.url': 'require("url").pathToFileURL(__filename).href',
+    'import.meta.url': 'globalThis.importMetaURL',
   },
   // Don't bundle 'vscode' (it's injected by VSCode's extension host).
   // 'electron' is sometimes an indirect dep — keep external.
