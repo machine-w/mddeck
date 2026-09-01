@@ -12,13 +12,14 @@
  */
 
 import type { Marpit as MarpitType } from '@marp-team/marpit'
-// The @marp-team/marpit package.json has no `exports` field for the
-// `/plugin` subpath, and esbuild won't inline dynamic require()s in a
-// CJS bundle (the .vsix ships no node_modules to resolve them at
-// runtime). Import the package's main entry instead and pick out the
-// already-exported `marpPlugin` symbol.
-import * as marpit from '@marp-team/marpit'
-const marpPluginFn = (marpit as any).marpPlugin ?? (marpit as any).default?.marpPlugin
+// @marp-team/marpit's main entry only exports the `Marpit` class
+// (not `marpPlugin`). The plugin factory lives in a CJS subpath
+// (`@marp-team/marpit/plugin`) whose package.json has no `exports`
+// field. esbuild's dynamic require would fail at .vsix runtime
+// (no node_modules), so we import the on-disk file directly via
+// a `mddeck/core`-relative path through the monorepo root.
+import marpPluginMod from '../../node_modules/@marp-team/marpit/plugin.js'
+const marpPluginFn = (marpPluginMod as any).default ?? marpPluginMod
 export const marpPlugin = marpPluginFn as <P extends any[]>(
   plugin: (...args: any[]) => any,
 ) => (...args: any[]) => any

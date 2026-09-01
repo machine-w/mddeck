@@ -8,8 +8,8 @@
  * main entry (which exports `marpPlugin`) and pull it off there.
  */
 
-import { marpPlugin as _marpPlugin } from '@marp-team/marpit'
-const marpPlugin = (_marpPlugin as any).default ?? _marpPlugin
+import marpPluginMod from '../../../node_modules/@marp-team/marpit/plugin.js'
+const marpPlugin = (marpPluginMod as any).default ?? marpPluginMod
 export const marpitPlugin = marpPlugin as <P extends any[]>(
   plugin: (...args: any[]) => any,
 ) => (...args: any[]) => any
