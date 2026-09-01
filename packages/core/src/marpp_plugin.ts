@@ -11,13 +11,11 @@
  * modification of their `import { Marp } from '../marp'` lines.
  */
 
-import { createRequire } from 'node:module'
 import type { Marpit as MarpitType } from '@marp-team/marpit'
+import { marpPlugin as marpitPluginFn } from '@marp-team/marpit/plugin'
 
 // marpitPlugin (re-export from marpit)
-const require = createRequire(import.meta.url)
-const marpitPluginMod = require('@marp-team/marpit/plugin')
-export const marpPlugin = (marpitPluginMod.default ?? marpitPluginMod) as <P extends any[]>(
+export const marpPlugin = (marpitPluginFn.default ?? marpitPluginFn) as <P extends any[]>(
   plugin: (...args: any[]) => any,
 ) => (...args: any[]) => any
 

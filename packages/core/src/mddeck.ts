@@ -18,8 +18,6 @@
 
 import { Element, Marpit as MarpitBase } from '@marp-team/marpit'
 import type { Marpit as MarpitType } from '@marp-team/marpit'
-import { createRequire } from 'node:module'
-const require = createRequire(import.meta.url)
 
 import { mddeckImpress } from './markdown/impress.js'
 import { registerDirectives } from './markdown/directives.js'
