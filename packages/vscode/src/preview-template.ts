@@ -86,7 +86,16 @@ export async function renderPreviewHtml(
 <title>mddeck preview</title>
 <style>
 ${css}
-.fallback-message { display: none; }
+/* Force the "browser not supported" fallback to be hidden, because
+ * impress.js's internal `body.impress-not-supported` class is
+ * set when it thinks the browser lacks support (and stays set when
+ * init fails) — without this, the fallback message would dominate
+ * the page even though impress is in fact working. We just hide the
+ * message and rely on the deck being visible. */
+.fallback-message,
+body.impress-not-supported .fallback-message {
+  display: none !important;
+}
 </style>
 </head>
 <body class="impress-not-supported">
