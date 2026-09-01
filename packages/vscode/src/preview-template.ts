@@ -52,13 +52,11 @@ export async function renderPreviewHtml(
   const mddeckCss = mediaUri('mddeck-vscode.css')
 
   const deck = new MdDeck()
-  const { html, css } = await deck.renderDocument({
-    markdown,
-    title: sourcePath.split(/[\\/]/).pop()?.replace(/\.md$/, '') ?? 'preview',
-    author: '',
-    impressJsBundle: '',
-    extraCss: '',
-  })
+  // renderAsString returns {html, css, comments}; renderDocument
+  // returns the full HTML document as a string. We want the css
+  // (so we can inline the scaffold) and the slides HTML (so we
+  // can drop them into the webview's <div id="impress">).
+  const { html, css } = await deck.renderAsString(markdown)
   const slides = extractImpressBody(html)
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
