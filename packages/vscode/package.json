@@ -1,5 +1,6 @@
 {
   "name": "mddeck-vscode",
+  "type": "module",
   "displayName": "mddeck — 3D Markdown Slides",
   "publisher": "machine-w",
   "version": "0.1.4",

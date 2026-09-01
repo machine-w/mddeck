@@ -13,6 +13,7 @@
 
 import * as vscode from 'vscode'
 import * as fs from 'node:fs/promises'
+import { mddeckConfiguration } from '../utils.js'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { spawn } from 'node:child_process'
