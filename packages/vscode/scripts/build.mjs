@@ -46,6 +46,24 @@ await build({
   define: {
     'import.meta.url': 'globalThis.importMetaURL',
   },
+  // The marpit package's package.json has no `exports` field for the
+  // `/plugin` subpath, so esbuild treats it as a dynamic require that
+  // can't be inlined. The .vsix doesn't ship node_modules, so that
+  // dynamic require throws at runtime. Force the marpit CJS subpath
+  // to be inlined into the bundle by aliasing it to the on-disk
+  // location that esbuild CAN resolve.
+  alias: {
+    '@marp-team/marpit/plugin': resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'node_modules',
+      '@marp-team',
+      'marpit',
+      'plugin.js',
+    ),
+  },
   // Don't bundle 'vscode' (it's injected by VSCode's extension host).
   // 'electron' is sometimes an indirect dep — keep external.
   external: ['vscode', 'electron'],
