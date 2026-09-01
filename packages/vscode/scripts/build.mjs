@@ -53,6 +53,9 @@ await build({
   // to be inlined into the bundle by aliasing it to the on-disk
   // location that esbuild CAN resolve.
   alias: {
+    // 'plugin' redirects to plugin.js (the CJS entry). 'plugin/index'
+    // (no .js) is added too because some code paths import the
+    // directory form.
     '@marp-team/marpit/plugin': resolve(
       __dirname,
       '..',
@@ -64,6 +67,10 @@ await build({
       'plugin.js',
     ),
   },
+  // Allow esbuild to resolve dependencies from the monorepo root's
+  // node_modules. Without this, packages that are only referenced via
+  // aliases (like @marp-team/marpit/plugin) might not be resolvable.
+  nodePaths: [resolve(__dirname, '..', '..', '..', 'node_modules')],
   // Don't bundle 'vscode' (it's injected by VSCode's extension host).
   // 'electron' is sometimes an indirect dep — keep external.
   external: ['vscode', 'electron'],
