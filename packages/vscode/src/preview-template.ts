@@ -38,8 +38,14 @@ function mediaUri(filename: string, context: vscode.ExtensionContext): string {
     .toString()
 }
 
-function extractImpressBody(fullHtml: string): string {
-  const m = fullHtml.match(/<div id="impress"[\s\S]*?>([\s\S]*?)<\/div>\s*<script/)
+// extractSlides pulls the inner HTML of the slide container that
+// renderAsString emits. We need this inner content (one <div class="step">
+// per slide) so the webview's <div id="impress"> can hold the same
+// slides without re-running the markdown parser.
+function extractSlides(fullHtml: string): string {
+  const m = fullHtml.match(
+    /<div class="mddeck-slide-container"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/,
+  )
   return m ? m[1] : ''
 }
 
