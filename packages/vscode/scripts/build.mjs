@@ -53,9 +53,7 @@ await build({
   // to be inlined into the bundle by aliasing it to the on-disk
   // location that esbuild CAN resolve.
   alias: {
-    // 'plugin' redirects to plugin.js (the CJS entry). 'plugin/index'
-    // (no .js) is added too because some code paths import the
-    // directory form.
+    // 'plugin' redirects to plugin.js (the CJS entry).
     '@marp-team/marpit/plugin': resolve(
       __dirname,
       '..',
@@ -66,6 +64,13 @@ await build({
       'marpit',
       'plugin.js',
     ),
+    // The cross-package @machine-w/mddeck-core import is a symlink
+    // (../../packages/core) which esbuild treats as an external
+    // dependency — it won't inline across the symlink boundary.
+    // Force it through the source path so all the .ts files in
+    // @mddeck/core get bundled (including marpp_plugin.ts which
+    // still does `require('@marp-team/marpit/plugin')`).
+    '@machine-w/mddeck-core': resolve(__dirname, '..', 'core', 'src'),
   },
   // Allow esbuild to resolve dependencies from the monorepo root's
   // node_modules. Without this, packages that are only referenced via
