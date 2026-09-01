@@ -64,7 +64,7 @@ export async function renderPreviewHtml(
   // (so we can inline the scaffold) and the slides HTML (so we
   // can drop them into the webview's <div id="impress">).
   const { html, css } = await deck.renderAsString(markdown)
-  const slides = extractImpressBody(html)
+  const slides = extractSlides(html)
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
 <head>
