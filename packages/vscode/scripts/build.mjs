@@ -73,6 +73,28 @@ await build({
             return { contents, loader: 'js' }
           },
         )
+        // Also intercept the relative paths the vendored @mddeck/core
+        // source uses to load plugin.js. esbuild refuses to resolve
+        // paths that escape the source file's directory; we redirect
+        // them to the absolute location.
+        build.onResolve(
+          { filter: /\.\.\/\.\.\/node_modules\/@marp-team\/marpit\/plugin\.js$/ },
+          () => ({
+            path: resolve(
+              __dirname, '..', '..', '..',
+              'node_modules', '@marp-team', 'marpit', 'plugin.js',
+            ),
+          }),
+        )
+        build.onResolve(
+          { filter: /\.\.\/\.\.\/\.\.\/node_modules\/@marp-team\/marpit\/plugin\.js$/ },
+          () => ({
+            path: resolve(
+              __dirname, '..', '..', '..',
+              'node_modules', '@marp-team', 'marpit', 'plugin.js',
+            ),
+          }),
+        )
       },
     },
   ],
