@@ -70,7 +70,13 @@ await build({
     // Force it through the source path so all the .ts files in
     // @mddeck/core get bundled (including marpp_plugin.ts which
     // still does `require('@marp-team/marpit/plugin')`).
-    '@machine-w/mddeck-core': resolve(__dirname, '..', 'core', 'src'),
+    '@machine-w/mddeck-core': resolve(
+      __dirname,        // packages/vscode/scripts/
+      '..', '..', '..',  // → packages/ → mddeck/ → monorepo root
+      'packages',
+      'core',
+      'src',
+    ),
   },
   // Allow esbuild to resolve dependencies from the monorepo root's
   // node_modules. Without this, packages that are only referenced via
