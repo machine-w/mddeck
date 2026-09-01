@@ -171,6 +171,7 @@
   },
   "devDependencies": {
     "@types/vscode": "1.85.0",
+    "esbuild": "0.21",
     "typescript": "^5.4.5",
     "vitest": "^2.1.0"
   }
