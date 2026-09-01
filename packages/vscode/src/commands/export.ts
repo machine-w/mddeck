@@ -91,9 +91,15 @@ export default {
   command: 'markdown.mddeck.export',
 
   default: async (uri?: vscode.Uri, allUris?: vscode.Uri[]) => {
-    const targets = (allUris ?? (uri ? [uri] : [])).filter(Boolean) as vscode.Uri[]
+    // If invoked from the command palette with no URI argument, fall
+    // back to the active editor's document so the command is always
+    // usable from the palette.
+    let targets = (allUris ?? (uri ? [uri] : [])).filter(Boolean) as vscode.Uri[]
+    if (targets.length === 0 && vscode.window.activeTextEditor) {
+      targets = [vscode.window.activeTextEditor.document.uri]
+    }
     if (targets.length === 0) {
-      vscode.window.showErrorMessage('No active editor to export.')
+      vscode.window.showErrorMessage('No active editor to export. Open a .md file first.')
       return
     }
 
