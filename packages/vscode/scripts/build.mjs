@@ -38,8 +38,9 @@ await build({
     {
       name: 'mddeck-aliases',
       setup(build) {
-        // @machine-w/mddeck-core → packages/core/src/ (instead of
-        // the symlinked dist/, which esbuild treats as external).
+        // @machine-w/mddeck-core → packages/core/src/index.ts
+        // (instead of the symlinked dist/, which esbuild treats as
+        // external).
         build.onResolve(
           { filter: /^@machine-w\/mddeck-core$/ },
           () => ({
@@ -49,6 +50,7 @@ await build({
               'packages',
               'core',
               'src',
+              'index.ts',
             ),
           }),
         )
