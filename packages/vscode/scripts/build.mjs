@@ -25,6 +25,13 @@ await build({
   platform: 'node',
   outfile: resolve(root, 'dist/extension.js'),
   sourcemap: true,
+  // In CJS bundles, `import.meta.url` evaluates to `{}` (an empty object).
+  // Three of our vendored modules use `createRequire(import.meta.url)`
+  // to load CJS sub-paths; without a valid URL string that throws
+  // 'filename must be a file URL object, file URL string, or absolute
+  // path string'. We inject a banner that defines a `__filename` for
+  // the bundle so the marpit plugin can fall back to that.
+  banner: { js: "var __filename = __filename || require('url').pathToFileURL(__dirname || '.').href;" },
   // Don't bundle 'vscode' (it's injected by VSCode's extension host).
   // 'electron' is sometimes an indirect dep — keep external.
   external: ['vscode', 'electron'],
