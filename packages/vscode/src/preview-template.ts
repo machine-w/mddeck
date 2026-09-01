@@ -4,10 +4,14 @@
  *
  * Inlines the impress.js + bootstrap script source directly into the
  * webview HTML so the webview never has to load a script over the
- * vscode-resource:// scheme (which is unreliable in some
- * sandbox configurations). impress.js itself is shipped in
- * media/impress.js; at preview time we read it from disk and embed
- * its contents inside a <script> tag.
+ * vscode-resource scheme.
+ *
+ * Two-way messaging with the extension host:
+ *  - webview → host:  window.addEventListener('keydown', ...) and a
+ *    'ready' message once impress.js is fully initialised.
+ *  - host → webview:  vscode message of type 'update' with a new
+ *    HTML string to swap in. The webview tears down the existing
+ *    impress() instance, replaces <body>'s contents, and re-inits.
  */
 
 import { promises as fssync } from 'node:fs'
@@ -41,7 +45,40 @@ export async function renderPreviewHtml(
   const deck = new MdDeck()
   const { html, css } = await deck.renderAsString(markdown)
   const slides = extractSlides(html)
+  // The host tells us when the markdown document changes. The webview
+  // re-inits impress() with the fresh slides.
+  const updateScript = `
+<script>(function(){
+  const vscode = acquireVsCodeApi();
+  // Re-init impress.js on each update. Tear down any existing
+  // instance by removing the canvas-transform styles impress injects
+  // onto <body>.
+  function reinit(slidesHTML) {
+    try {
+      // impress() exposes init(), goto(), and binds keyboard handlers
+      // to the document. We just call it again after replacing the
+      // slides HTML; impress tears down its own state on init.
+      document.getElementById('impress').innerHTML = slidesHTML;
+      var api = impress();
+      api.init();
+    } catch (err) {
+      console.error('mddeck preview: reinit failed', err);
+    }
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'update') return;
+    reinit(ev.data.slidesHTML);
+  });
+  // Tell host we're ready to receive updates once impress init
+  // completes.
+  setTimeout(function(){ vscode.postMessage({ type: 'ready' }); }, 100);
+})();</script>`
 
+  // Keyboard navigation: impress.js installs its own keydown handlers
+  // on the document, but only AFTER impress() is called. The
+  // bootstrap script below does that. The HTML also includes
+  // data-transition-duration so impress.js's default transitions
+  // work.
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,6 +125,7 @@ ${impressSource}
   }
 })();
 </script>
+${updateScript}
 </body>
 </html>`
 }

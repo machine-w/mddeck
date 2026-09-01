@@ -20,6 +20,7 @@ export default {
   // as 'mddeck: Preview Slide Deck'.
 
   default: async (uri?: vscode.Uri, context?: vscode.ExtensionContext) => {
+    const ext = context
     // Use passed URI or fall back to the active editor.
     const targetUri = uri ?? vscode.window.activeTextEditor?.document.uri
     if (!targetUri) {
@@ -74,11 +75,46 @@ export default {
         )],
       },
     )
-    panel.webview.html = await renderPreviewHtml(markdown, targetUri.fsPath, context)
-    // For debugging: write the HTML to a tmp file and reveal in OS.
-    const { writeFile } = await import('node:fs/promises')
-    const tmp = `/tmp/mddeck-preview-${Date.now()}.html`
-    await writeFile(tmp, panel.webview.html)
-    console.log('mddeck preview HTML written to', tmp)
+    const initialHtml = await renderPreviewHtml(
+      markdown,
+      targetUri.fsPath,
+      context,
+    )
+    panel.webview.html = initialHtml
+
+    // Live updates: re-render the deck when the markdown document
+    // changes and push the new slides HTML to the webview.
+    let debounceTimer: NodeJS.Timeout | undefined
+    const updateListener = vscode.workspace.onDidChangeTextDocument(
+      (e) => {
+        if (e.document.uri.toString() !== targetUri.toString()) return
+        clearTimeout(debounceTimer)
+        debounceTimer = setTimeout(async () => {
+          const newMarkdown = e.document.getText()
+          const newHtml = await renderPreviewHtml(
+            newMarkdown,
+            targetUri.fsPath,
+            context,
+          )
+          // Re-render to get the new slides HTML.
+          const m = newHtml.match(
+            /<div id="impress"[^>]*>([\s\S]*?)<\/div>\s*<script>/,
+          )
+          const slidesHTML = m ? m[1] : ''
+          panel.webview.postMessage({
+            type: 'update',
+            slidesHTML,
+          })
+        }, 250)
+      },
+    )
+
+    // Clean up the debounced listener when the panel closes.
+    panel.onDidDispose(() => {
+      clearTimeout(debounceTimer)
+      updateListener.dispose()
+    })
+  },
+}
   },
 }
