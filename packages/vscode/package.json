@@ -65,6 +65,11 @@
       },
       {
         "category": "mddeck",
+        "command": "markdown.mddeck.previewSlideDeck",
+        "title": "mddeck: Preview Slide Deck"
+      },
+      {
+        "category": "mddeck",
         "command": "markdown.mddeck.showQuickPick",
         "title": "mddeck: Show All Commands..."
       },
@@ -86,6 +91,18 @@
         {
           "command": "markdown.mddeck.newMddeckMarkdown",
           "group": "file"
+        }
+      ],
+      "editor/context/context": [
+        {
+          "command": "markdown.mddeck.previewSlideDeck",
+          "group": "navigation",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "markdown.mddeck.export",
+          "group": "navigation",
+          "when": "editorLangId == markdown"
         }
       ]
     },
