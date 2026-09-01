@@ -32,43 +32,31 @@ await build({
   // (../../packages/core) which esbuild treats as an external
   // dependency — it won't inline across the symlink boundary.
   // Force it through the source path so all the .ts files in
-  // @mddeck/core get bundled (including marpp_plugin.ts which
-  // still does `require('@marp-team/marpit/plugin')`).
-  '@machine-w/mddeck-core': resolve(
-    __dirname,        // packages/vscode/scripts/
-    '..', '..', '..',  // → packages/ → mddeck/ → monorepo root
-    'packages',
-    'core',
-    'src',
-  ),
-  // esbuild plugin: pre-load the marpit CJS subpath file so it gets
-  // inlined into the bundle. The vendored @mddeck/core files import
-  // `@marp-team/marpit/plugin` (a subpath whose package.json has no
-  // `exports` field), and esbuild would otherwise leave it as a
-  // dynamic require that the .vsix can't resolve. The plugin file
-  // requires `./lib/plugin` which we also pre-load so the whole
-  // chain is bundled.
+  // @mddeck/core get bundled. The esbuild `alias` field is only
+  // available in newer versions; emulate it via onResolve below.
   plugins: [
     {
-      name: 'marpit-plugin-inline',
+      name: 'mddeck-aliases',
       setup(build) {
-        // Resolve the bare specifier '@marp-team/marpit/plugin' to
-        // the on-disk plugin.js file.
+        // @machine-w/mddeck-core → packages/core/src/ (instead of
+        // the symlinked dist/, which esbuild treats as external).
         build.onResolve(
-          { filter: /^@marp-team\/marpit\/plugin$/ },
+          { filter: /^@machine-w\/mddeck-core$/ },
           () => ({
             path: resolve(
-              __dirname,
+              __dirname,        // packages/vscode/scripts/
               '..', '..', '..',  // → monorepo root
-              'node_modules',
-              '@marp-team',
-              'marpit',
-              'plugin.js',
+              'packages',
+              'core',
+              'src',
             ),
           }),
         )
-        // Load the plugin.js file (which re-requires lib/plugin
-        // internally; onLoad below will inline lib/plugin too).
+        // Pre-load the marpit CJS subpath file (and its inner
+        // lib/plugin) so it gets inlined into the bundle. The vendored
+        // @mddeck/core files do `require('@marp-team/marpit/plugin')`,
+        // which esbuild would otherwise leave as a dynamic require that
+        // the .vsix can't resolve (it ships no node_modules).
         build.onLoad(
           { filter: /node_modules\/@marp-team\/marpit\/plugin\.js$/ },
           async (args) => {
@@ -76,7 +64,6 @@ await build({
             return { contents, loader: 'js' }
           },
         )
-        // Inline the inner lib/plugin file (the real marpPlugin).
         build.onLoad(
           { filter: /node_modules\/@marp-team\/marpit\/lib\/plugin\.js$/ },
           async (args) => {
