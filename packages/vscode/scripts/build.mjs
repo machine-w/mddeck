@@ -1,11 +1,13 @@
 /**
- * scripts/build.mjs — bundle the VSCode extension with esbuild.
+ * scripts/build.mjs — bundle the entire VSCode extension with esbuild.
  *
- * The vsce package step doesn't include any of our `node_modules` deps
- * (we strip dependencies to keep the VSIX small — puppeteer-core alone
- * is ~25 MB). For the @machine-w/mddeck-core dep that option.ts needs
- * at runtime, we esbuild-bundle it into a single dist/option.bundled.js
- * so the extension has no `node_modules` import to resolve.
+ * One entry, one output, one source map: dist/extension.js.
+ * Bundles @machine-w/mddeck-core so the .vsix has no runtime deps.
+ *
+ * This avoids the headaches of:
+ *   - tsc's per-file output requiring many files in the .vsix
+ *   - vsce's "case-insensitive path" error from npm file: symlinks
+ *   - missing-files errors when .vsix's dist/ subdirs are incomplete
  */
 
 import { build } from 'esbuild'
@@ -16,17 +18,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 
 await build({
-  entryPoints: [resolve(root, 'src/option.bundled.ts')],
+  entryPoints: [resolve(root, 'src/extension.ts')],
   bundle: true,
   format: 'esm',
   target: 'es2022',
   platform: 'node',
-  outfile: resolve(root, 'dist/option.bundled.js'),
+  outfile: resolve(root, 'dist/extension.js'),
   sourcemap: true,
-  // Don't bundle node built-ins as externals (we want everything inlined
-  // except those). markdown-it, marpit etc. all get inlined.
+  // Don't bundle 'vscode' (it's injected by VSCode's extension host).
+  // 'electron' is sometimes an indirect dep — keep external.
   external: ['vscode', 'electron'],
   logLevel: 'info',
 })
 
-console.log('Bundled dist/option.bundled.js')
+console.log('Bundled dist/extension.js')
