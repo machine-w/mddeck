@@ -8,7 +8,7 @@ transitionDuration: 800
 
 # Welcome to mddeck
 
-A **markdown-first** slide deck engine produces 3D presentations powered by [impress.js](https://impress.js).
+A **markdown-first** slide deck engine produces 3D prez senta powered by [impress.js](https://impress.js).
 
 ---
 

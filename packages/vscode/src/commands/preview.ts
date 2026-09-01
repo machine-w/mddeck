@@ -1,26 +1,102 @@
 /**
- * commands/preview.ts — open an mddeck slide deck preview in a
- * dedicated webview, instead of trying to hijack VS Code's built-in
- * Markdown preview (which requires the extension to act as a
- * markdown-it plugin and breaks with module-mode bundling).
- *
- * The webview shows a single-file impress.js deck generated from the
- * currently active Markdown document.
+ * commands/preview.ts — render the current Markdown file as an
+ * impress.js deck and open it in the system default browser (via
+ * `vscode.env.openExternal`). The browser polls the source file via
+ * a `setInterval` for changes, and swaps the slides HTML in place
+ * without re-initialising impress.js (so the keyboard state, current
+ * step, etc. are preserved).
  */
 
 import * as vscode from 'vscode'
 import * as path from 'node:path'
 import { promises as fs } from 'node:fs'
-import { renderPreviewHtml } from '../preview-template.js'
+import * as os from 'node:os'
+import * as crypto from 'node:crypto'
+import { MdDeck } from '@machine-w/mddeck-core'
+
+/** Build the impress.js deck HTML for a markdown source.
+ *  Used for both the initial render and for the auto-refresh script
+ *  that the browser polls. */
+async function buildDeckHtml(markdown: string, sourcePath: string): Promise<string> {
+  const deck = new MdDeck()
+  // renderDocument produces a complete single-file HTML document with
+  // impress.js source inlined (because we don't pass an
+  // impressJsBundle, it falls back to a runtime error — that's
+  // fine here, we'll strip the runtime script before writing the file
+  // and inject our own).
+  const fullHtml = await deck.renderDocument({
+    markdown,
+    title: path.basename(sourcePath, '.md'),
+    author: '',
+    impressJsBundle: '',
+    extraCss: '',
+  })
+  // The impress init script that renderDocument emits tries to set
+  // body.impress-ready after a short delay. That's fine for a static
+  // HTML; we'll add our own update script on top of it.
+  return fullHtml
+}
+
+/** Strip the impress init <script> that renderDocument emits (the
+ *  one that calls impress().init()) and inject our own update script
+ *  that:
+ *    1. Calls impress().init() on first load
+ *    2. Polls ?v=<hash> every second; when the hash changes, fetches
+ *       the new <body> contents and replaces it via impress().init()
+ *       (which re-reads the slides) without a full page reload.
+ *
+ *  The cache-bust query is supplied by the extension host when it
+ *  rewrites the file. The browser just appends ?v=… to the URL, so
+ *  the file system always serves the new copy. */
+function injectUpdateScript(html: string): string {
+  return html.replace(
+    /<script>[\s\S]*?impress\(\)\.init[\s\S]*?<\/script>/,
+    /* html */ `<script>
+(function () {
+  function boot() {
+    try {
+      var api = impress();
+      api.init();
+      document.body.classList.remove('impress-not-supported');
+      document.body.classList.add('impress-ready');
+    } catch (e) {
+      console.error('mddeck preview: init failed', e);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+  // Live updates: re-fetch the same file with a cache-busting query
+  // string and re-initialise impress() with the new slides. impress()
+  // re-reads the slides from the DOM on init, so the keyboard
+  // navigation handlers get re-bound.
+  setInterval(async function () {
+    try {
+      var res = await fetch(location.pathname + '?_=' + Date.now(), {
+        cache: 'no-store',
+      });
+      if (!res.ok) return;
+      var txt = await res.text();
+      // Pull the new <div id="impress"> inner HTML out of the response.
+      var m = txt.match(/<div id="impress"[^>]*>([\s\S]*?)<\/div>\s*<script>/);
+      if (!m) return;
+      document.getElementById('impress').innerHTML = m[1];
+      var api = impress();
+      api.init();
+    } catch (e) {
+      console.error('mddeck preview: update failed', e);
+    }
+  }, 1000);
+})();
+</script>`,
+  )
+}
 
 export default {
   command: 'markdown.mddeck.previewSlideDeck',
-  // command name kept for backwards compat; also bound via package.json
-  // contributes.contextMenus.markdown.editor to the right-click menu
-  // as 'mddeck: Preview Slide Deck'.
-
   default: async (uri?: vscode.Uri, context?: vscode.ExtensionContext) => {
-    const ext = context
     // Use passed URI or fall back to the active editor.
     const targetUri = uri ?? vscode.window.activeTextEditor?.document.uri
     if (!targetUri) {
@@ -35,84 +111,60 @@ export default {
       )
       return
     }
-    if (!targetUri.fsPath.endsWith('.md')) {
-      vscode.window.showErrorMessage(
-        'mddeck preview only works on .md files.',
-      )
-      return
-    }
 
-    let markdown: string
-    try {
-      markdown = await fs.readFile(targetUri.fsPath, 'utf-8')
-    } catch (err) {
-      vscode.window.showErrorMessage(
-        `Failed to read file: ${(err as Error).message}`,
-      )
-      return
-    }
-
-    // Pick a column for the webview (right side of the editor).
-    const viewColumn =
-      vscode.window.activeTextEditor?.viewColumn === vscode.ViewColumn.One
-        ? vscode.ViewColumn.Two
-        : vscode.ViewColumn.One
-
-    const panel = vscode.window.createWebviewPanel(
-      'mddeckPreview',
-      `mddeck — ${path.basename(targetUri.fsPath)}`,
-      viewColumn,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-        // Allow the webview to load the bundled impress.js + preview
-        // runtime from the extension's media/ directory. Without this,
-        // the webview's content security policy blocks the
-        // <script src="vscode-resource://..."> tags and impress never
-        // initialises.
-        localResourceRoots: [vscode.Uri.joinPath(
-          context.extensionUri, 'media',
-        )],
-      },
+    // Write the preview HTML to a per-file path under the system
+    // tmp directory. The directory name is hashed from the source
+    // path so different files don't clobber each other.
+    const key = crypto
+      .createHash('sha1')
+      .update(targetUri.toString())
+      .digest('hex')
+      .slice(0, 12)
+    const previewDir = path.join(
+      os.tmpdir(),
+      `mddeck-preview-${key}`,
     )
-    const initialHtml = await renderPreviewHtml(
-      markdown,
-      targetUri.fsPath,
-      context,
-    )
-    panel.webview.html = initialHtml
+    const previewPath = path.join(previewDir, 'index.html')
+    await fs.mkdir(previewDir, { recursive: true })
 
-    // Live updates: re-render the deck when the markdown document
-    // changes and push the new slides HTML to the webview.
-    let debounceTimer: NodeJS.Timeout | undefined
-    const updateListener = vscode.workspace.onDidChangeTextDocument(
+    async function writePreview() {
+      const markdown = await fs.readFile(targetUri.fsPath, 'utf-8')
+      let html = await buildDeckHtml(markdown, targetUri.fsPath)
+      html = injectUpdateScript(html)
+      await fs.writeFile(previewPath, html, 'utf-8')
+    }
+    await writePreview()
+
+    // Open in the system default browser via VSCode's openExternal.
+    // The browser will load file://...index.html, which executes
+    // impress().init() and starts the polling loop.
+    await vscode.env.openExternal(vscode.Uri.file(previewPath))
+
+    // Live updates: rewrite the preview file whenever the source
+    // markdown changes. The browser's polling loop will pick up the
+    // new content (different file size → cache miss on the no-store
+    // fetch) and re-init impress() with the new slides.
+    let debounce: NodeJS.Timeout | undefined
+    const listener = vscode.workspace.onDidChangeTextDocument(
       (e) => {
         if (e.document.uri.toString() !== targetUri.toString()) return
-        clearTimeout(debounceTimer)
-        debounceTimer = setTimeout(async () => {
-          const newMarkdown = e.document.getText()
-          const newHtml = await renderPreviewHtml(
-            newMarkdown,
-            targetUri.fsPath,
-            context,
+        clearTimeout(debounce)
+        debounce = setTimeout(() => {
+          writePreview().catch((err) =>
+            console.error('mddeck preview: rewrite failed', err),
           )
-          // Re-render to get the new slides HTML.
-          const m = newHtml.match(
-            /<div id="impress"[^>]*>([\s\S]*?)<\/div>\s*<script>/,
-          )
-          const slidesHTML = m ? m[1] : ''
-          panel.webview.postMessage({
-            type: 'update',
-            slidesHTML,
-          })
         }, 250)
       },
     )
-
-    // Clean up the debounced listener when the panel closes.
-    panel.onDidDispose(() => {
-      clearTimeout(debounceTimer)
-      updateListener.dispose()
-    })
+    // Stop rewriting the file when the source is closed or renamed.
+    const closeListener = vscode.workspace.onDidCloseTextDocument(
+      (e) => {
+        if (e.uri.toString() === targetUri.toString()) {
+          clearTimeout(debounce)
+          listener.dispose()
+          closeListener.dispose()
+        }
+      },
+    )
   },
 }
