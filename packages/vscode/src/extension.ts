@@ -34,7 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(
       previewSlideDeckCommand.command,
-      previewSlideDeckCommand.default,
+      // Capture the ExtensionContext in the handler closure. We can't
+      // rely on `this` because the command object's `default` is called
+      // by VS Code without a `this` binding.
+      (uri?: vscode.Uri) => previewSlideDeckCommand.default(uri, context),
     ),
     vscode.commands.registerCommand(
       showQuickPickCommand.command,

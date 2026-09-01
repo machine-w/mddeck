@@ -19,12 +19,18 @@ export default {
   // contributes.contextMenus.markdown.editor to the right-click menu
   // as 'mddeck: Preview Slide Deck'.
 
-  default: async (uri?: vscode.Uri) => {
+  default: async (uri?: vscode.Uri, context?: vscode.ExtensionContext) => {
     // Use passed URI or fall back to the active editor.
     const targetUri = uri ?? vscode.window.activeTextEditor?.document.uri
     if (!targetUri) {
       vscode.window.showErrorMessage(
         'No active Markdown editor. Open a .md file and try again.',
+      )
+      return
+    }
+    if (!context) {
+      vscode.window.showErrorMessage(
+        'mddeck: extension context not available. Please reload the window.',
       )
       return
     }
@@ -58,6 +64,14 @@ export default {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
+        // Allow the webview to load the bundled impress.js + preview
+        // runtime from the extension's media/ directory. Without this,
+        // the webview's content security policy blocks the
+        // <script src="vscode-resource://..."> tags and impress never
+        // initialises.
+        localResourceRoots: [vscode.Uri.joinPath(
+          context.extensionUri, 'media',
+        )],
       },
     )
     panel.webview.html = await renderPreviewHtml(markdown, targetUri.fsPath)
