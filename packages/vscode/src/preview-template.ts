@@ -2,46 +2,20 @@
  * preview-template.ts — build the HTML string for the mddeck preview
  * webview.
  *
- * Loads impress.js + a small bootstrap script from the extension's
- * media/ directory. The deck's HTML+CSS are produced by @mddeck/core
- * the same way the CLI does.
- *
- * IMPORTANT: do NOT evaluate module-level code that touches
- * `import.meta.url` (or any other relative path). The extension
- * host's `__filename` does NOT match the on-disk path of the
- * bundled extension.js, so resolving media/ at import time
- * throws. Everything is evaluated lazily inside renderPreviewHtml.
+ * Inlines the impress.js + bootstrap script source directly into the
+ * webview HTML so the webview never has to load a script over the
+ * vscode-resource:// scheme (which is unreliable in some
+ * sandbox configurations). impress.js itself is shipped in
+ * media/impress.js; at preview time we read it from disk and embed
+ * its contents inside a <script> tag.
  */
 
-import { promises as fs } from 'node:fs'
 import { promises as fssync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import * as vscode from 'vscode'
 import { MdDeck } from '@machine-w/mddeck-core'
 
-/** Lazily compute the path to the extension's media/ directory.
- *  Called on demand from renderPreviewHtml — never at import time. */
-function mediaDir(): string {
-  // import.meta.url in the bundled CJS is replaced with
-  // `globalThis.importMetaURL` (see scripts/build.mjs banner). At
-  // runtime in the extension host that resolves to a file:// URL
-  // pointing at the bundle's directory.
-  const url = (import.meta as any).url as string
-  return resolve(dirname(fileURLToPath(url)), '..', 'media')
-}
-
-function mediaUri(filename: string, context: vscode.ExtensionContext): string {
-  return vscode.Uri
-    .joinPath(context.extensionUri, 'media', filename)
-    .with({ scheme: 'vscode-resource' })
-    .toString()
-}
-
-// extractSlides pulls the inner HTML of the slide container that
-// renderAsString emits. We need this inner content (one <div class="step">
-// per slide) so the webview's <div id="impress"> can hold the same
-// slides without re-running the markdown parser.
 function extractSlides(fullHtml: string): string {
   const m = fullHtml.match(
     /<div class="mddeck-slide-container"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/,
@@ -54,23 +28,25 @@ export async function renderPreviewHtml(
   sourcePath: string,
   context: vscode.ExtensionContext,
 ): Promise<string> {
-  const impress = mediaUri('impress.js', context)
-  const runtime = mediaUri('preview-runtime.js', context)
-  const mddeckCss = mediaUri('mddeck-vscode.css', context)
+  // Locate the bundled impress.js by walking up from the bundled
+  // extension.js to the extension's media/ directory.
+  const url = (import.meta as any).url as string
+  const bundleDir = dirname(fileURLToPath(url))
+  const mediaDir = resolve(bundleDir, '..', 'media')
+  const impressSource = await fssync.readFile(
+    resolve(mediaDir, 'impress.js'),
+    'utf-8',
+  )
 
   const deck = new MdDeck()
-  // renderAsString returns {html, css, comments}; renderDocument
-  // returns the full HTML document as a string. We want the css
-  // (so we can inline the scaffold) and the slides HTML (so we
-  // can drop them into the webview's <div id="impress">).
   const { html, css } = await deck.renderAsString(markdown)
   const slides = extractSlides(html)
+
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>mddeck preview</title>
-<link rel="stylesheet" href="${mddeckCss}">
 <style>
 ${css}
 .fallback-message { display: none; }
@@ -82,11 +58,36 @@ ${css}
 </div>
 <div id="impress"
      data-transition-duration="1000"
-     data-width="1920" data-height="1080">
+     data-width="1920" data-height="1080"
+     data-perspective="1000">
 ${slides}
 </div>
-<script src="${impress}"></script>
-<script src="${runtime}"></script>
+<script>
+${impressSource}
+</script>
+<script>
+(function () {
+  function init() {
+    try {
+      if (typeof impress !== 'function') {
+        console.error('mddeck preview: impress is not loaded');
+        return;
+      }
+      var api = impress();
+      api.init();
+      document.body.classList.remove('impress-not-supported');
+      document.body.classList.add('impress-ready');
+    } catch (err) {
+      console.error('mddeck preview: impress init failed', err);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 </body>
 </html>`
 }
