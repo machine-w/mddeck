@@ -31,9 +31,9 @@ function mediaDir(): string {
   return resolve(dirname(fileURLToPath(url)), '..', 'media')
 }
 
-function mediaUri(filename: string): string {
+function mediaUri(filename: string, context: vscode.ExtensionContext): string {
   return vscode.Uri
-    .file(resolve(mediaDir(), filename))
+    .joinPath(context.extensionUri, 'media', filename)
     .with({ scheme: 'vscode-resource' })
     .toString()
 }
@@ -46,10 +46,11 @@ function extractImpressBody(fullHtml: string): string {
 export async function renderPreviewHtml(
   markdown: string,
   sourcePath: string,
+  context: vscode.ExtensionContext,
 ): Promise<string> {
-  const impress = mediaUri('impress.js')
-  const runtime = mediaUri('preview-runtime.js')
-  const mddeckCss = mediaUri('mddeck-vscode.css')
+  const impress = mediaUri('impress.js', context)
+  const runtime = mediaUri('preview-runtime.js', context)
+  const mddeckCss = mediaUri('mddeck-vscode.css', context)
 
   const deck = new MdDeck()
   // renderAsString returns {html, css, comments}; renderDocument

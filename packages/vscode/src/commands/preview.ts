@@ -74,6 +74,11 @@ export default {
         )],
       },
     )
-    panel.webview.html = await renderPreviewHtml(markdown, targetUri.fsPath)
+    panel.webview.html = await renderPreviewHtml(markdown, targetUri.fsPath, context)
+    // For debugging: write the HTML to a tmp file and reveal in OS.
+    const { writeFile } = await import('node:fs/promises')
+    const tmp = `/tmp/mddeck-preview-${Date.now()}.html`
+    await writeFile(tmp, panel.webview.html)
+    console.log('mddeck preview HTML written to', tmp)
   },
 }
