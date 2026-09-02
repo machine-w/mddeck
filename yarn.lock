@@ -205,7 +205,7 @@
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz#f4c663e862f06dc98ca4d453862c46902789a18d"
   integrity sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==
 
-"@machine-w/mddeck-core@file:packages/core":
+"@machine-w/mddeck-core@link:packages/core":
   version "0.1.2"
   dependencies:
     "@marp-team/marpit" "^3.2.2"
