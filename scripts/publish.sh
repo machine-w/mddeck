@@ -24,6 +24,12 @@
 
 set -euo pipefail
 
+# ---------- cleanup trap ----------
+# `.npmrc` is rendered from the gitignored template with the real auth
+# token in it. We must remove it on ANY exit path — success, error,
+# or signal — so a token never lingers on disk if the script aborts.
+trap 'rm -f "$REPO_ROOT/.npmrc"' EXIT
+
 # ---------- preflight ----------
 if [[ -z "${NPM_TOKEN:-}" ]]; then
   echo "NPM_TOKEN not set. Either:"
