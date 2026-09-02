@@ -1,6 +1,6 @@
 {
   "name": "mddeck-slides",
-  "displayName": "mddeck — 3D Markdown Slides",
+  "displayName": "mddeck — 3D Slide Deck Engine",
   "publisher": "machine-w",
   "version": "0.1.4",
   "description": "Create 3D slide decks written in mddeck Markdown on VS Code",
