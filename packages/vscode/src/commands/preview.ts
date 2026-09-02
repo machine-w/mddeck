@@ -12,86 +12,63 @@ import * as path from 'node:path'
 import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as crypto from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import { MdDeck } from '@machine-w/mddeck-core'
 
+/** Inject a small polling <script> right before </body>. The script
+ *  re-fetches the current page every second with cache: 'no-store' and
+ *  compares the byte size to the previously seen one. If they differ,
+ *  we reload the page — impress() then re-runs the new DOM and the user
+ *  sees their edits live. */
+function injectUpdateScript(html: string): string {
+  const script = `
+<script>
+(function () {
+  var lastLength = -1;
+  function check() {
+    fetch(location.href, { cache: 'no-store' })
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        if (lastLength === -1) { lastLength = text.length; return; }
+        if (text.length !== lastLength) { location.reload(); }
+      })
+      .catch(function () { /* ignore */ });
+  }
+  setInterval(check, 1000);
+})();
+</script>
+`
+  if (html.includes('</body>')) {
+    return html.replace('</body>', script + '</body>')
+  }
+  return html + script
+}
+
 /** Build the impress.js deck HTML for a markdown source.
- *  Used for both the initial render and for the auto-refresh script
- *  that the browser polls. */
+ *  Reads impress.js from the bundled media/ directory and passes
+ *  its source to renderDocument's impressJsBundle so the deck includes
+ *  a working <script> tag in the static HTML. */
 async function buildDeckHtml(markdown: string, sourcePath: string): Promise<string> {
+  // In a bundled CJS, import.meta.url is replaced via the define
+  // option with globalThis.importMetaURL (see scripts/build.mjs banner).
+  // At runtime in the extension host that resolves to a file:// URL
+  // pointing at the bundle's directory.
+  const url = (import.meta as any).url as string
+  const bundleDir = dirname(fileURLToPath(url))
+  const impressJs = await fs.readFile(
+    resolve(bundleDir, '..', 'media', 'impress.js'),
+    'utf-8',
+  )
+
   const deck = new MdDeck()
-  // renderDocument produces a complete single-file HTML document with
-  // impress.js source inlined (because we don't pass an
-  // impressJsBundle, it falls back to a runtime error — that's
-  // fine here, we'll strip the runtime script before writing the file
-  // and inject our own).
-  const fullHtml = await deck.renderDocument({
+  return await deck.renderDocument({
     markdown,
     title: path.basename(sourcePath, '.md'),
     author: '',
-    impressJsBundle: '',
+    impressJsBundle: impressJs,
     extraCss: '',
   })
-  // The impress init script that renderDocument emits tries to set
-  // body.impress-ready after a short delay. That's fine for a static
-  // HTML; we'll add our own update script on top of it.
-  return fullHtml
-}
-
-/** Strip the impress init <script> that renderDocument emits (the
- *  one that calls impress().init()) and inject our own update script
- *  that:
- *    1. Calls impress().init() on first load
- *    2. Polls ?v=<hash> every second; when the hash changes, fetches
- *       the new <body> contents and replaces it via impress().init()
- *       (which re-reads the slides) without a full page reload.
- *
- *  The cache-bust query is supplied by the extension host when it
- *  rewrites the file. The browser just appends ?v=… to the URL, so
- *  the file system always serves the new copy. */
-function injectUpdateScript(html: string): string {
-  return html.replace(
-    /<script>[\s\S]*?impress\(\)\.init[\s\S]*?<\/script>/,
-    /* html */ `<script>
-(function () {
-  function boot() {
-    try {
-      var api = impress();
-      api.init();
-      document.body.classList.remove('impress-not-supported');
-      document.body.classList.add('impress-ready');
-    } catch (e) {
-      console.error('mddeck preview: init failed', e);
-    }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-  // Live updates: re-fetch the same file with a cache-busting query
-  // string and re-initialise impress() with the new slides. impress()
-  // re-reads the slides from the DOM on init, so the keyboard
-  // navigation handlers get re-bound.
-  setInterval(async function () {
-    try {
-      var res = await fetch(location.pathname + '?_=' + Date.now(), {
-        cache: 'no-store',
-      });
-      if (!res.ok) return;
-      var txt = await res.text();
-      // Pull the new <div id="impress"> inner HTML out of the response.
-      var m = txt.match(/<div id="impress"[^>]*>([\s\S]*?)<\/div>\s*<script>/);
-      if (!m) return;
-      document.getElementById('impress').innerHTML = m[1];
-      var api = impress();
-      api.init();
-    } catch (e) {
-      console.error('mddeck preview: update failed', e);
-    }
-  }, 1000);
-})();
-</script>`,
-  )
 }
 
 export default {
