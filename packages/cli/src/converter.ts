@@ -73,7 +73,15 @@ function findChromium(): string | undefined {
  * translate on level 3 is still applied". After fixing that, a second
  * bug surfaced: even with page-breaks on .step, the html/body sizing
  * capped the document at one viewport height, so page.pdf() only
- * generated one page. */
+ * generated one page.
+ *
+ * 5. `.step` opacity — impress.js applies `opacity: 0.3` to all steps
+ *    by default and `opacity: 1` only to the currently-active one
+ *    (the rest are tagged `.step.future` / `.step.past` and faded).
+ *    In PDF every slide needs full opacity, so PRINT_MODE_CSS forces
+ *    `opacity: 1 !important` to win over `.step.future/.past`'s
+ *    `opacity: 0.3` (which would otherwise make pages 2..N appear
+ *    grayed-out). */
 const PRINT_MODE_CSS = `
 /* mddeck: print mode — flatten impress.js 3D for PDF */
 html, body {
@@ -118,6 +126,10 @@ html, body {
   left: auto !important;
   /* Drop the box-shadow so it doesn't bleed past the layout box. */
   box-shadow: none !important;
+  /* Force full opacity on every step. impress.js dims non-active
+     steps to 0.3 via '.step.future { opacity: 0.3 }', which would
+     otherwise render pages 2..N of the PDF as faded / grayed-out. */
+  opacity: 1 !important;
 }
 .step:last-child { page-break-after: auto; break-after: auto; }
 body.impress-not-supported .fallback-message { display: none !important; }
