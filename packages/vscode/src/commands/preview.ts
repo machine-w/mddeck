@@ -39,13 +39,16 @@ function injectUpdateScript(html: string): string {
 })();
 </script>
 `
-  // NOTE: do NOT anchor on </body>. impress.js source bundles a string
-  // template (`impressConsole`) that itself contains "</body></html>"; a
-  // naive String.replace() would inject our script *inside* the
-  // impress.js source string instead of after it, breaking the parser.
-  // Use </html> as the anchor instead — it appears exactly once.
-  if (html.includes('</html>')) {
-    return html.replace('</html>', script + '</html>')
+  // NOTE: do NOT use html.replace('</body>', ...) or html.replace('</html>', ...).
+  // impress.js's source bundles a string template (the impressConsole
+  // script) that itself contains "</body></html>';" as part of its
+  // stringified sub-document; any naive String.replace() call injects
+  // our script *inside* the impress.js source string instead of after
+  // it, breaking the parser. Anchor on the LAST occurrence of </html>
+  // via lastIndexOf so we always splice in at the real document end.
+  const idx = html.lastIndexOf('</html>')
+  if (idx >= 0) {
+    return html.slice(0, idx) + script + html.slice(idx)
   }
   return html + script
 }
