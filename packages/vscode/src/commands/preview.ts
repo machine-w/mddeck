@@ -39,8 +39,13 @@ function injectUpdateScript(html: string): string {
 })();
 </script>
 `
-  if (html.includes('</body>')) {
-    return html.replace('</body>', script + '</body>')
+  // NOTE: do NOT anchor on </body>. impress.js source bundles a string
+  // template (`impressConsole`) that itself contains "</body></html>"; a
+  // naive String.replace() would inject our script *inside* the
+  // impress.js source string instead of after it, breaking the parser.
+  // Use </html> as the anchor instead — it appears exactly once.
+  if (html.includes('</html>')) {
+    return html.replace('</html>', script + '</html>')
   }
   return html + script
 }
