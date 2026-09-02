@@ -93,7 +93,7 @@
           "group": "file"
         }
       ],
-      "editor/context/context": [
+      "editor/context": [
         {
           "command": "markdown.mddeck.previewSlideDeck",
           "group": "navigation",
