@@ -25,7 +25,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.5] — 2026-09-02
+## [0.1.6] — 2026-09-02
+
+### Fixed
+- **`mddeck --pdf` produced blank PDFs.** impress.js init applies
+  transforms at four levels (`html`/`body` height, `#impress` scale,
+  the anonymous centering wrapper, and `.step`'s own translate3d), and
+  `PRINT_MODE_CSS` only reset the last one. The previous version of
+  this fix landed in two pieces (the `ef7c94d` commit fixed the
+  `transform` layers but missed the html/body sizing; the current
+  commit finishes it). PDF now correctly produces one page per slide
+  with each slide's content visible.
+- **PDF slides looked tiny inside a 1920×1080 page.** Marpit's
+  scaffold hardcodes `.step { width: 1280px; height: 720px }`, so
+  the rendered slide design was pixel-perfect at 1280×720 but looked
+  letterboxed inside the default 1920×1080 PDF page. `PRINT_MODE_CSS`
+  now sets `.step { width: var(--pdf-w); height: var(--pdf-h); }`,
+  scales the root `font-size` by `--pdf-scale` (so all `em`-sized
+  headings/text scale proportionally), and centers the content with
+  flexbox. Box-shadow is dropped in print (it was bleeding onto a
+  trailing blank page after `transform: scale()` was tried).
+
+### Internal
+- `scripts/publish.sh` now registers a `trap 'rm -f .npmrc' EXIT` so
+  the token-bearing `.npmrc` is removed on any exit path. Previously,
+  if the script aborted mid-run, the rendered `.npmrc` lingered on
+  disk (this was the bug that left the live token on disk during the
+  0.1.4 → 0.1.5 publish).
+- `packages/core/src/{marpp,marpit}_plugin.ts` header comments now
+  document the `@marp-team/marpit/plugin.js` deep-import fragility:
+  it works because marpit has no `exports` field. If marpit ever
+  adds one without `./plugin`, every vendored plugin breaks at first
+  import. Remediation options are spelled out in the file headers
+  and mirrored in `CLAUDE.md` gotchas.
+- `.github/releases/v0.1.5.md` saved for the eventual `gh release
+  create` (gh CLI wasn't authenticated at the time of the 0.1.5
+  release).
+
+### Notes
+- Public API is unchanged. Consumers on `^0.1.2` will resolve to
+  0.1.6 on next install.
+- If you upgrade from 0.1.4 directly: 0.1.4 was unpublished-blocked
+  (npm granular tokens can't unpublish via 2FA) and has been deprecated
+  on the registry. Go straight to 0.1.6.
 
 ### Fixed
 - **`Cannot find module '…@marp-team/marpit/plugin.js'` when running
@@ -169,7 +211,8 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
     Promise) when `math: 'katex'` is set, since katex is loaded
     asynchronously
 
-[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/machine-w/mddeck/releases/tag/v0.1.6
 [0.1.5]: https://github.com/machine-w/mddeck/releases/tag/v0.1.5
 [0.1.4]: https://github.com/machine-w/mddeck/releases/tag/v0.1.4
 [0.1.0]: https://github.com/machine-w/mddeck/releases/tag/v0.1.0
