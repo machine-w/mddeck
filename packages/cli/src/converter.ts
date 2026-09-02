@@ -93,6 +93,21 @@ html, body {
   transform-style: flat !important;
 }
 .step {
+  /* Fill the page. Marpit's scaffold hardcodes '.step { width: 1280px;
+     height: 720px }' (rewritten from its 'section' rule); the page-size
+     CSS vars override it here so each PDF page is fully covered. */
+  width: var(--pdf-w, 1920px) !important;
+  height: var(--pdf-h, 1080px) !important;
+  /* Scale up the root font-size by --pdf-scale so all 'em'-based sizes
+     (h1, h2, p, code, etc.) grow proportionally to fill the larger
+     page. Pixel-sized values (paddings, margins, box-shadow blur) stay
+     the same. The step layout box still respects page-break-after
+     so we get exactly one slide per page with no overflow. */
+  font-size: calc(36px * var(--pdf-scale, 1)) !important;
+  /* Vertically center the content within the now-larger box. */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
   position: relative !important;
   transform: none !important;
   transform-origin: 50% 50% !important;
@@ -101,6 +116,8 @@ html, body {
   margin: 0 !important;
   top: auto !important;
   left: auto !important;
+  /* Drop the box-shadow so it doesn't bleed past the layout box. */
+  box-shadow: none !important;
 }
 .step:last-child { page-break-after: auto; break-after: auto; }
 body.impress-not-supported .fallback-message { display: none !important; }
@@ -149,8 +166,17 @@ export class Converter {
     }
 
     const deck = new MdDeck({ ...this.options, printable: true })
+    const { width, height } = this.resolvePdfSize(deck)
+
+    // Inject the resolved page size + a scale factor so PRINT_MODE_CSS can
+    // expand the step to fill the page. The base 1280 matches Marpit's
+    // hardcoded scaffold size in @marp-team/marpit/lib/theme/scaffold.js
+    // (which `step_replace` rewrites to `.step`). When the step uses
+    // --mddeck-step-width/height from a custom theme, the user can override
+    // these CSS variables in that theme; we don't try to detect that here.
+    const PRINT_VARS = `:root { --pdf-w: ${width}px; --pdf-h: ${height}px; --pdf-scale: ${(width / 1280).toFixed(4)}; }`
     const html = await renderImpressTemplate(deck, markdown, {
-      extraCss: PRINT_MODE_CSS,
+      extraCss: `${PRINT_VARS}\n${PRINT_MODE_CSS}`,
       title: file.path ? file.path.replace(/^.*\//, '').replace(/\.md$/, '') : undefined,
     })
 
