@@ -50,10 +50,45 @@ function findChromium(): string | undefined {
   return undefined
 }
 
-/** Print-mode CSS injected before page.pdf() so 3D is flattened. */
+/** Print-mode CSS injected before page.pdf() so 3D is flattened.
+ *
+ * impress.js init applies transforms AND container sizing at four levels:
+ *   1. `html, body` — `height: 100%` to make a fullscreen 3D canvas. The
+ *      body element stays 1080px tall in headless Chrome, so even with
+ *      `page-break-after: always` on each .step, page.pdf() only sees one
+ *      page worth of body content. Must be reset to `height: auto` so
+ *      the body grows to fit all stacked steps.
+ *   2. `#impress` — `transform: scale(0.416667)` for auto-fit-to-viewport
+ *   3. `#impress > div` (anonymous centering wrapper) —
+ *      `transform: translate(STEP_X, STEP_Y)` to position the active step
+ *      in the viewport center. Both translate values are huge numbers
+ *      because they compensate for the step's `data-x/y`.
+ *   4. `.step` itself — `transform: translate3d(STEP_X, STEP_Y, STEP_Z)`
+ *      for the slide's individual 3D position.
+ *
+ * If any of these four levels is left intact, the steps end up
+ * physically positioned outside the PDF page dimensions (1920×1080) and
+ * every page comes out blank. The earlier version only reset level 4
+ * and the bug was "steps are off-screen because the centering
+ * translate on level 3 is still applied". After fixing that, a second
+ * bug surfaced: even with page-breaks on .step, the html/body sizing
+ * capped the document at one viewport height, so page.pdf() only
+ * generated one page. */
 const PRINT_MODE_CSS = `
 /* mddeck: print mode — flatten impress.js 3D for PDF */
-#impress {
+html, body {
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+}
+#impress,
+#impress > div {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+  top: auto !important;
+  left: auto !important;
   perspective: none !important;
   transform-style: flat !important;
 }
