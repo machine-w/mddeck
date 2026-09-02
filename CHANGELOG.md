@@ -25,28 +25,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.4] — 2026-09-02
+## [0.1.5] — 2026-09-02
 
 ### Fixed
-- **`yarn install` failed in fresh checkouts** with `Package "" refers to a
-  non-existing file '"/Users/machine/myworkspace/core"'`. Three underlying
-  causes were addressed:
-  - Root `package.json` no longer pins a stale dev-dependency on the
-    published `@machine-w/mddeck-cli` that pointed yarn at a broken
-    release artifact. Root now only declares its own tooling
-    (eslint/prettier/vitest).
-  - Stray `package-lock.json` (from npm) removed; this is a yarn
-    project and `yarn.lock` is the source of truth.
-- **CLI runtime error `Cannot find module '…@marp-team/marpit/plugin.js'`**
-  when running `bin/mddeck.js`. The vendored marpit plugin shims
+- **`Cannot find module '…@marp-team/marpit/plugin.js'` when running
+  `bin/mddeck.js` from an npm-installed `@machine-w/mddeck-cli`**
+  (regression in 0.1.4). The vendored marpit plugin shims
   (`packages/core/src/markdown/marpit_plugin.ts` and
-  `packages/core/src/marpp_plugin.ts`) had relative paths to the
-  hoisted root `node_modules` that were each one `..` short.
+  `packages/core/src/marpp_plugin.ts`) used a hardcoded relative path
+  that assumed a workspace install layout. Replaced with a normal
+  `import '@marp-team/marpit/plugin.js'` so Node / esbuild resolve it
+  the same way in any install context.
+- **`ERR_PACKAGE_PATH_NOT_EXPORTED` from `require('@machine-w/mddeck-core')`**
+  (regression in 0.1.4). The `exports["."]` map only declared `import`
+  and `types` conditions, so CJS-style resolution fell through with no
+  match. Added `default` (and re-ordered `types` first) so both ESM
+  `import` and CJS `require` resolve to `dist/index.js`.
 
 ### Notes
-- No public API changes. Consumers who pin `@machine-w/mddeck-cli`
-  `^0.1.2` will see this as `0.1.4` on the next install but the runtime
-  behavior is unchanged from a working 0.1.2 install.
+- 0.1.4 was published with the same two bugs and could not be
+  unpublished (npm granular tokens are blocked from unpublish by the
+  registry's 2FA policy). 0.1.4 has been deprecated on npm with a
+  pointer to 0.1.5.
+- Public API is unchanged. Consumers on `^0.1.2` will resolve to 0.1.5
+  on next install.
 
 ---
 
@@ -167,6 +169,7 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
     Promise) when `math: 'katex'` is set, since katex is loaded
     asynchronously
 
-[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/machine-w/mddeck/releases/tag/v0.1.5
 [0.1.4]: https://github.com/machine-w/mddeck/releases/tag/v0.1.4
 [0.1.0]: https://github.com/machine-w/mddeck/releases/tag/v0.1.0

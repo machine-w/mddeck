@@ -12,8 +12,14 @@ import type { Marpit as MarpitType } from '@marp-team/marpit'
 // field. esbuild's dynamic require would fail at .vsix runtime
 // (no node_modules), so we import the on-disk file directly via
 // a `mddeck/core`-relative path through the monorepo root.
-// @ts-ignore - relative path to workspace node_modules (yarn hoists to repo root)
-import marpPluginMod from '../../../node_modules/@marp-team/marpit/plugin.js'
+/**
+ * Import the marpit plugin factory via Node's normal module resolution
+ * instead of a relative path. marpit ships its plugin factory at
+ * `@marp-team/marpit/plugin.js` and has no `exports` field, so Node's
+ * legacy deep-import resolution finds it regardless of install depth
+ * (workspace hoisting, npm install, or esbuild bundling).
+ */
+import marpPluginMod from '@marp-team/marpit/plugin.js'
 const marpPluginFn = (marpPluginMod as any).default ?? marpPluginMod
 export const marpPlugin = marpPluginFn as <P extends any[]>(
   plugin: (...args: any[]) => any,

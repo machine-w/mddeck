@@ -1,6 +1,6 @@
 {
   "name": "@machine-w/mddeck-core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Markdown → impress.js slide deck core (parser + theme + directives)",
   "license": "MIT",
   "type": "module",
@@ -8,20 +8,24 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     },
     "./browser": {
+      "types": "./dist/browser.d.ts",
       "import": "./dist/browser.js",
-      "types": "./dist/browser.d.ts"
+      "default": "./dist/browser.js"
     },
     "./katex": {
+      "types": "./dist/plugins_katex/index.d.ts",
       "import": "./dist/plugins_katex/index.js",
-      "types": "./dist/plugins_katex/index.d.ts"
+      "default": "./dist/plugins_katex/index.js"
     },
     "./mathjax": {
+      "types": "./dist/plugins_mathjax/index.d.ts",
       "import": "./dist/plugins_mathjax/index.js",
-      "types": "./dist/plugins_mathjax/index.d.ts"
+      "default": "./dist/plugins_mathjax/index.js"
     },
     "./plugins_katex/index.js": "./dist/plugins_katex/index.js",
     "./plugins_mathjax/index.js": "./dist/plugins_mathjax/index.js",
