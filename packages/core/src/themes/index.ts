@@ -11,6 +11,7 @@ import { scaffoldCss, scaffoldMeta } from './scaffold.js'
 import defaultThemeCss from './default.js'
 import gaiaThemeCss from './gaia.js'
 import uncoverThemeCss from './uncover.js'
+import impressThemeCss from './impress.js'
 
 export interface MddeckTheme {
   name: string
@@ -22,6 +23,7 @@ export const builtinThemes: MddeckTheme[] = [
   { name: 'default', css: defaultThemeCss },
   { name: 'gaia', css: gaiaThemeCss },
   { name: 'uncover', css: uncoverThemeCss },
+  { name: 'impress', css: impressThemeCss },
 ]
 
 /** The scaffold CSS that gets prepended to every theme's CSS. */

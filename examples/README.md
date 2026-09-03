@@ -11,6 +11,7 @@ This directory contains ready-made Markdown decks you can build and study.
 | [`theme-default.md`](./theme-default.md) | The `default` built-in theme — GitHub-flavored look, blue accent, left-aligned. Best for engineering reviews and technical talks. |
 | [`theme-gaia.md`](./theme-gaia.md) | The `gaia` built-in theme — bold blue gradient, gold accents, centered content, shadowed h1. Best for keynote-style stage presentations. |
 | [`theme-uncover.md`](./theme-uncover.md) | The `uncover` built-in theme — light gray background, magenta accent, centered headings, justified body, pagination triangle. Best for academic / conference talks. |
+| [`theme-impress.md`](./theme-impress.md) | The `impress` built-in theme — modeled on the [official impress.js demo](https://impress.js.org/): white slide cards, soft gray radial-gradient canvas, PT Sans / PT Serif typography. Press **Esc** to exit fullscreen, **P** for the speaker console. |
 
 ## Building them
 
@@ -43,6 +44,7 @@ theme. The theme is selected via the front-matter `theme:` directive
 node packages/cli/bin/mddeck.js examples/theme-default.md  -o examples/theme-default.html
 node packages/cli/bin/mddeck.js examples/theme-gaia.md     -o examples/theme-gaia.html
 node packages/cli/bin/mddeck.js examples/theme-uncover.md  -o examples/theme-uncover.html
+node packages/cli/bin/mddeck.js examples/theme-impress.md  -o examples/theme-impress.html
 ```
 
 For a custom theme, write your own CSS file and pass it via `--theme`:

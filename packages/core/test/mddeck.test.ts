@@ -94,8 +94,13 @@ describe('MdDeck frontmatter', () => {
 })
 
 describe('MdDeck themes', () => {
-  it('registers default / gaia / uncover themes', () => {
-    expect(builtinThemes.map((t) => t.name)).toEqual(['default', 'gaia', 'uncover'])
+  it('registers default / gaia / uncover / impress themes', () => {
+    expect(builtinThemes.map((t) => t.name)).toEqual([
+      'default',
+      'gaia',
+      'uncover',
+      'impress',
+    ])
   })
 
   it('themeSet.has() returns true for built-in themes', () => {
@@ -103,6 +108,7 @@ describe('MdDeck themes', () => {
     expect(md.themeSet.has('default')).toBe(true)
     expect(md.themeSet.has('gaia')).toBe(true)
     expect(md.themeSet.has('uncover')).toBe(true)
+    expect(md.themeSet.has('impress')).toBe(true)
     expect(md.themeSet.has('nonexistent')).toBe(false)
   })
 

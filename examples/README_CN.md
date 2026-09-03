@@ -11,6 +11,7 @@
 | [`theme-default.md`](./theme-default.md) | 内置 `default` 主题 —— GitHub 风格外观、蓝色 accent、左对齐。适合工程评审与技术演讲。 |
 | [`theme-gaia.md`](./theme-gaia.md) | 内置 `gaia` 主题 —— 大胆的蓝色渐变、金色 accent、居中内容、带阴影的 h1。适合 keynote 风格的舞台演讲。 |
 | [`theme-uncover.md`](./theme-uncover.md) | 内置 `uncover` 主题 —— 浅灰背景、品红 accent、标题居中、正文两端对齐、右下角分页三角。适合学术 / 会议演讲。 |
+| [`theme-impress.md`](./theme-impress.md) | 内置 `impress` 主题 —— 复刻[官方 impress.js 演示](https://impress.js.org/)：白底卡片、柔和的径向渐变背景、PT Sans / PT Serif 字体。按 **Esc** 退出全屏，**P** 打开演讲者控制台。 |
 
 ## 构建方式
 
