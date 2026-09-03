@@ -5,7 +5,7 @@
 > 把 Markdown 转换为 impress.js HTML，运行时零浏览器依赖。
 
 这是底层的核心库，同时驱动着 `@machine-w/mddeck-cli` 命令行工具和
-`mddeck-vscode` 编辑器扩展。
+`mddeck-slides` VSCode 扩展（已在 VSCode Marketplace 发布）。
 
 如果你想把 mddeck 集成到自己的工具里（构建流水线、静态站点生成器、
 服务端渲染服务等），就用这个包。

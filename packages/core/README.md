@@ -5,7 +5,8 @@
 > Markdown → impress.js HTML, with no runtime dependencies on a browser.
 
 This is the lower-level library that powers both the `@machine-w/mddeck-cli`
-command-line tool and the planned `mddeck-vscode` editor extension.
+command-line tool and the `mddeck-slides` VSCode extension (published on
+the VS Code Marketplace).
 
 If you're building a custom integration (e.g. embedding mddeck into a
 static site generator, a server-side rendering service, or your own

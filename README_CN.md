@@ -59,11 +59,13 @@ $ mddeck presentation.md -o slides.html
 - **PDF 导出** —— headless Chromium 把 deck 转成可打印的 PDF（每页一张幻灯片）
 - **监视 & 实时重建** —— 文件变化自动重建，便于快速迭代
 - **HTTP server** —— 把输出目录当静态站点服务，多设备访问
-- **主题** —— 三个内置主题（default / gaia / uncover），支持自定义 CSS
+- **主题** —— 六个内置主题（`default` / `gaia` / `uncover` / `impress` /
+  `impress-flat` / `impress-bare`），支持自定义 CSS
 - **数学公式** —— KaTeX（默认）或 MathJax，服务端渲染
 - **Emoji** —— twemoji（Twitter 风格 SVG），支持 `:shortcode:` 和 unicode
 - **XSS 净化** —— 默认安全，内联 HTML 会被过滤
-- **VSCode 扩展** —— 编辑器内实时预览（即将推出）
+- **VSCode 扩展** —— 编辑器内实时预览（在 VSCode Marketplace 上以
+  `mddeck-slides` 名称发布）
 
 ---
 
@@ -78,7 +80,7 @@ mddeck/
 │   ├── core/                # @machine-w/mddeck-core — 解析器 + 主题 + directives
 │   │                         （CLI 和 VSCode 扩展依赖的底层库）
 │   ├── cli/                 # @machine-w/mddeck-cli — `mddeck` 命令
-│   └── vscode/              # mddeck-vscode — VSCode 扩展（计划中）
+│   └── vscode/              # mddeck-slides — VSCode 扩展（已发布）
 ├── examples/                # 现成的 Markdown deck 样例
 └── tsconfig.base.json
 ```
@@ -87,9 +89,9 @@ mddeck/
 
 | 包 | 状态 | 说明 |
 |---|---|---|
-| `@machine-w/mddeck-core` | ✅ v0.1.0 | 核心框架：Markdown → impress.js HTML + CSS |
-| `@machine-w/mddeck-cli` | ✅ v0.1.0 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
-| `mddeck-vscode` | ✅ v0.1.0 | VSCode 扩展，编辑器内实时预览 |
+| `@machine-w/mddeck-core` | ✅ v0.1.7 | 核心框架：Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.7 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
+| `mddeck-slides` (VSCode) | ✅ v0.1.7 | VSCode 扩展，编辑器内实时预览 |
 
 ---
 
@@ -230,13 +232,16 @@ math: katex
 
 ## 主题
 
-mddeck 自带三个主题：
+mddeck 自带六个主题：
 
 | 主题 | 风格 |
 |---|---|
-| `default` | GitHub 风，蓝色强调色 |
-| `gaia` | 蓝色渐变背景，内容居中 |
-| `uncover` | 学术风，标题居中，页脚带三角分页标 |
+| `default` | GitHub 风外观，蓝色 accent，左对齐 |
+| `gaia` | 大胆的蓝色渐变，金色 accent，居中内容，带阴影的 h1 |
+| `uncover` | 浅灰背景，品红 accent，标题居中，正文两端对齐，右下角分页三角 |
+| `impress` | 白底卡片 + 1px 边框 + 软阴影 + 圆角，柔和的径向渐变背景（PT Sans / PT Serif 字体） |
+| `impress-flat` | 类似 `impress`，但去掉了 1px 边框和圆角 —— 白卡仍带轻微阴影 |
+| `impress-bare` | 类似 `impress-flat`，但 slide 完全透明 —— 文字直接浮在 canvas 上 |
 
 通过 front-matter 的 `theme:` 字段切换，或给 CLI 传 `--theme` 参数。
 

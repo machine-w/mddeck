@@ -49,11 +49,11 @@ If `mddeck` isn't in PATH, the export command will show:
 #### From source
 
 ```bash
-git clone https://github.com/.../mddeck.git
+git clone https://github.com/machine-w/mddeck.git
 cd mddeck/packages/vscode
 yarn install
-yarn package                       # produces mddeck-vscode-0.1.2.vsix
-code --install-extension mddeck-vscode-0.1.2.vsix
+node_modules/.bin/vsce package --no-dependencies  # produces mddeck-slides-0.1.7.vsix
+code --install-extension mddeck-slides-0.1.7.vsix
 ```
 
 #### From VS Code Marketplace (once published)

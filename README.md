@@ -64,12 +64,13 @@ click to navigate.
   (one page per slide)
 - **Watch & live reload** — auto-rebuild on file changes for fast iteration
 - **HTTP server** — serve the output directory for multi-device viewing
-- **Themes** — three built-in themes (default, gaia, uncover) plus support
-  for custom CSS
+- **Themes** — six built-in themes (`default`, `gaia`, `uncover`,
+  `impress`, `impress-flat`, `impress-bare`) plus support for custom CSS
 - **Math** — KaTeX (default) or MathJax, server-side rendered
 - **Emoji** — twemoji (Twitter-style SVG) for `:shortcode:` and unicode
 - **XSS sanitization** — safe by default; inline HTML is filtered
-- **VSCode extension** — live preview in the editor (coming soon)
+- **VSCode extension** — live preview in the editor (available on the
+  VS Code Marketplace as `mddeck-slides`)
 
 ---
 
@@ -83,7 +84,7 @@ mddeck/
 │   ├── core/                # @machine-w/mddeck-core — parser + theme + directives
 │   │                         (the library that powers the CLI & VSCode)
 │   ├── cli/                 # @machine-w/mddeck-cli — the `mddeck` command
-│   └── vscode/              # mddeck-vscode — VSCode extension (planned)
+│   └── vscode/              # mddeck-slides — VSCode extension (published)
 ├── examples/                # ready-made Markdown decks
 └── tsconfig.base.json
 ```
@@ -92,9 +93,9 @@ mddeck/
 
 | Package | Status | Description |
 |---|---|---|
-| `@machine-w/mddeck-core` | ✅ v0.1.0 | The framework: Markdown → impress.js HTML + CSS |
-| `@machine-w/mddeck-cli` | ✅ v0.1.0 | The `mddeck` CLI command (HTML / PDF / watch / server) |
-| `mddeck-vscode` | 🚧 planned | VSCode extension with live preview |
+| `@machine-w/mddeck-core` | ✅ v0.1.7 | The framework: Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.7 | The `mddeck` CLI command (HTML / PDF / watch / server) |
+| `mddeck-slides` (VSCode) | ✅ v0.1.7 | VSCode extension with live preview |
 
 ---
 
@@ -240,13 +241,16 @@ full reference.
 
 ## Themes
 
-Three themes ship with mddeck:
+Six themes ship with mddeck:
 
 | Theme | Style |
 |---|---|
-| `default` | GitHub-flavored look, blue accent |
-| `gaia` | Blue gradient background, centered content |
-| `uncover` | Academic style, centered headings, page-corner pagination |
+| `default` | GitHub-flavored look, blue accent, left-aligned |
+| `gaia` | Bold blue gradient, gold accents, centered content, shadowed h1 |
+| `uncover` | Light gray background, magenta accent, centered headings, justified body, page-corner pagination |
+| `impress` | White slide cards with 1px border, soft drop shadow, 10px radius, on a soft radial-gradient canvas (PT Sans / PT Serif) |
+| `impress-flat` | Like `impress` but without the border or border-radius — card is borderless, still has the drop shadow |
+| `impress-bare` | Like `impress-flat` but the slide itself is fully transparent — text floats directly on the canvas |
 
 Switch via the front-matter `theme:` key, or pass `--theme` to the CLI.
 
