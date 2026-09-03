@@ -1,6 +1,6 @@
 {
   "name": "@machine-w/mddeck-cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "mddeck CLI — convert Markdown to impress.js slides (HTML / PDF / watch / server)",
   "license": "MIT",
   "type": "module",

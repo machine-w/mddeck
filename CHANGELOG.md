@@ -25,7 +25,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.6] — 2026-09-02
+## [0.1.7] — 2026-09-03
+
+### Added
+- **Three new built-in themes** modeled on the [official impress.js demo](https://impress.js.org/):
+  - `impress` — white slide cards with 1px border, soft drop shadow, 10px radius, on a radial-gradient canvas. Uses PT Sans for body and PT Serif for slide text.
+  - `impress-flat` — same as `impress` but the slide's border, border-radius, and box-shadow are removed. The text is still in a white card, but the card is borderless.
+  - `impress-bare` — same as `impress-flat` but the slide itself is fully transparent. The text floats directly on the canvas, with no card frame at all.
+- **`examples/theme-impress.md`**, **`examples/theme-impress-flat.md`**, **`examples/theme-impress-bare.md`** — one example per new theme. `theme-impress-bare.md` is the most elaborate: 6 slides with 3D positions (`<!-- _position -->`), 3D rotations (`<!-- _rotate -->`), and decorative elements (rotated sidebar text, mirrored "Want to know more?" sticker, faded "H.SS" stamp, floating "transforms · transitions · CSS3" label, word-level `translateZ` for the 3D text effect).
+
+### Fixed
+- **Built-in themes' `.step` rules were being overridden by Marpit's scaffold.** Marpit emits a more-specific selector `div.marpit.mddeck > div.mddeck-slide-container > .step` (after `step_replace` rewrites `section` to `.step`), and its higher specificity was winning over the simple `.step` selectors in our theme CSS. New postcss plugin `scope_flatten.ts` collapses `div… .step .step` to a single `.step` so the slide stops requiring a non-existent nested step, and rewrites `:where(section):not([\\20 root])` to `.step` so the theme's CSS-variable definitions actually target the slide. Without this, only the first theme (default) was rendering correctly; `gaia`, `uncover`, and the three new impress themes all looked like default.
+- **Scaffold was appended instead of prepended.** `scaffold_inject.ts` used `root.append(scaffoldCss)`, which placed the scaffold's `body { background: var(--mddeck-bg) }` and other rules AFTER every theme, so the scaffold's defaults overrode the theme's overrides (`--mddeck-bg: radial-gradient(...)` set by a theme would always be shadowed by the scaffold's `background: var(--mddeck-bg)` — which evaluated to the scaffold's own `--mddeck-bg`, not the theme's). Switched to `root.prepend(scaffoldCss)` so themes actually win.
+- **VS Code preview didn't recognize the three new built-in themes.** `getMarpThemeSetFor()` had a hard-coded whitelist of the original three themes; without adding the new ones, previewing a markdown that used `theme: impress` would try to load an external theme file from `markdown.mddeck.themes` and silently fall back to default.
+- **"Export Slide Deck..." command was missing the `mddeck: ` prefix** in its title. Added it so all 6 registered commands share a consistent prefix.
+
+### Notes
+- Public API unchanged. Consumers on `^0.1.5` resolve to `0.1.7` on next install; `^0.1.6` (and `^0.1.2`) also resolve to `0.1.7` since semver-major is still `0`.
+- To use the new themes, just set `theme: impress` (or `impress-flat` / `impress-bare`) in the markdown front-matter. See `examples/theme-impress*.md` for the syntax.
+- The impress.js 2.0.0 bundle's overview mode (`showOverview()` API from 1.x) was removed; the in-deck `Esc` key only triggers `exitFullscreen()`. A simple CSS-class-based overview shim (toggle on `Esc`, click a slide to exit) was prototyped but reverted in commit `7df9d0b` because the visual was too subtle to be worth the complexity. Open `impress().showStep(id)` from the browser console to jump to a specific slide if needed.
 
 ### Fixed
 - **`mddeck --pdf` produced blank PDFs.** impress.js init applies
