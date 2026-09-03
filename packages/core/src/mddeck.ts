@@ -25,6 +25,7 @@ import { autoLayoutPlugin } from './markdown/auto_layout.js'
 import { printModePlugin } from './markdown/print_mode.js'
 import stepReplacePostcss from './postcss/step_replace.js'
 import scaffoldInjectPostcss from './postcss/scaffold_inject.js'
+import scopeFlattenPostcss from './postcss/scope_flatten.js'
 import { builtinThemes } from './themes/index.js'
 
 // Modules vendored from @marp-team/marp-core (lightly adapted for mddeck)
@@ -95,6 +96,13 @@ export class MdDeck extends MarpitBase {
       slideContainer: [mddeckSlideContainer],
       printable: opts.printable ?? false,
       looseYAML: true,
+      // Enable CSS nesting so Marpit emits modern nested selectors for
+      // theme rules instead of descendant-combinator rewrites (e.g.
+      // '.step .step' which requires nested <section> elements, a
+      // structure mddeck's flat <div class="step"> rendering doesn't
+      // produce). With cssNesting: true, theme rules match the actual
+      // mddeck HTML structure.
+      cssNesting: true,
       // Disable inlineSVG — we don't need pixel-perfect SVG scaling because
       // impress.js handles 3D scaling in CSS, and SVG wrapping would conflict
       // with our step token rewrite.
@@ -138,6 +146,12 @@ export class MdDeck extends MarpitBase {
     // the packed theme CSS (Marpit's scaffold and built-in directives still
     // emit `section` rules, but we render <div class="step">).
     this.use(stepReplacePostcss)
+    // Install PostCSS plugin that fixes Marpit's CSS scoping for mddeck's
+    // flat step structure. Marpit assumes `<section> > <section>` nesting;
+    // mddeck emits `<div class="step">` with direct children (no nested
+    // step), so Marpit's scoping produces descendant selectors that never
+    // match. See postcss/scope_flatten.ts for details.
+    this.use(scopeFlattenPostcss)
     // Install PostCSS plugin that injects our own scaffold CSS (with .step
     // selectors, --mddeck-* CSS vars, and the fallback-message hide rule).
     this.use(scaffoldInjectPostcss)
