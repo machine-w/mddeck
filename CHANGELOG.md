@@ -229,7 +229,7 @@ slide deck that animates in 3D when navigated. It's a spiritual cousin of
     Promise) when `math: 'katex'` is set, since katex is loaded
     asynchronously
 
-[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/machine-w/mddeck/compare/v0.1.7...HEAD
 [0.1.6]: https://github.com/machine-w/mddeck/releases/tag/v0.1.6
 [0.1.5]: https://github.com/machine-w/mddeck/releases/tag/v0.1.5
 [0.1.4]: https://github.com/machine-w/mddeck/releases/tag/v0.1.4
