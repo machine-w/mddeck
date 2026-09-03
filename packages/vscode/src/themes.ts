@@ -45,7 +45,7 @@ class Themes {
     const themeName = themeMatch[1].trim().replace(/^["']|["']$/g, '')
 
     // Built-in themes don't need a file
-    if (['default', 'gaia', 'uncover'].includes(themeName)) return {}
+    if (['default', 'gaia', 'uncover', 'impress', 'impress-flat', 'impress-bare'].includes(themeName)) return {}
 
     // Look up user-configured theme files
     const themeFiles = mddeckConfig().get<string[]>('themes') ?? []

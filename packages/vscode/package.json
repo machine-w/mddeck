@@ -51,7 +51,7 @@
       {
         "category": "mddeck",
         "command": "markdown.mddeck.export",
-        "title": "Export Slide Deck..."
+        "title": "mddeck: Export Slide Deck..."
       },
       {
         "category": "mddeck",
