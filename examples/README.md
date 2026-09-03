@@ -8,14 +8,17 @@ This directory contains ready-made Markdown decks you can build and study.
 |---|---|
 | [`basic.md`](./basic.md) | A minimal 6-slide deck showcasing the basic 3D positioning directives. No math, no emoji — just the core syntax. |
 | [`m2-features.md`](./m2-features.md) | Demos KaTeX math (inline + block), twemoji (shortcodes + unicode), and HTML sanitization (XSS test). Use this as a regression test for the M2 features. |
+| [`theme-default.md`](./theme-default.md) | The `default` built-in theme — GitHub-flavored look, blue accent, left-aligned. Best for engineering reviews and technical talks. |
+| [`theme-gaia.md`](./theme-gaia.md) | The `gaia` built-in theme — bold blue gradient, gold accents, centered content, shadowed h1. Best for keynote-style stage presentations. |
+| [`theme-uncover.md`](./theme-uncover.md) | The `uncover` built-in theme — light gray background, magenta accent, centered headings, justified body, pagination triangle. Best for academic / conference talks. |
 
 ## Building them
 
 From the repository root:
 
 ```bash
-# Build basic example → HTML
-node packages/cli/bin/mddeck.js examples/basic.md -o examples/basic.html
+# Build any example → HTML
+node packages/cli/bin/mddeck.js examples/<name>.md -o examples/<name>.html
 
 # Build m2-features with KaTeX math → HTML
 node packages/cli/bin/mddeck.js examples/m2-features.md \
@@ -28,6 +31,26 @@ node packages/cli/bin/mddeck.js examples/basic.md --pdf -o examples/basic.pdf
 # Or use the build script which handles all of the above
 node examples/build.mjs basic.md
 node examples/build-m2.mjs
+```
+
+### Themes
+
+The three theme examples show off the visual style of each built-in
+theme. The theme is selected via the front-matter `theme:` directive
+(no CLI flag needed). Try them side by side:
+
+```bash
+node packages/cli/bin/mddeck.js examples/theme-default.md  -o examples/theme-default.html
+node packages/cli/bin/mddeck.js examples/theme-gaia.md     -o examples/theme-gaia.html
+node packages/cli/bin/mddeck.js examples/theme-uncover.md  -o examples/theme-uncover.html
+```
+
+For a custom theme, write your own CSS file and pass it via `--theme`:
+
+```bash
+node packages/cli/bin/mddeck.js examples/basic.md \
+  --theme ./my-custom-theme.css \
+  -o examples/basic.html
 ```
 
 The generated `.html` files are gitignored — they're meant to be regenerated

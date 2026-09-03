@@ -8,14 +8,17 @@
 |---|---|
 | [`basic.md`](./basic.md) | 最简 6 张幻灯片，演示 3D 定位 directive。无数学、无 emoji —— 只展示核心语法。 |
 | [`m2-features.md`](./m2-features.md) | 演示 KaTeX 数学（行内 + 块）、twemoji（短码 + unicode）、HTML 净化（XSS 测试）。可作为 M2 特性的回归测试。 |
+| [`theme-default.md`](./theme-default.md) | 内置 `default` 主题 —— GitHub 风格外观、蓝色 accent、左对齐。适合工程评审与技术演讲。 |
+| [`theme-gaia.md`](./theme-gaia.md) | 内置 `gaia` 主题 —— 大胆的蓝色渐变、金色 accent、居中内容、带阴影的 h1。适合 keynote 风格的舞台演讲。 |
+| [`theme-uncover.md`](./theme-uncover.md) | 内置 `uncover` 主题 —— 浅灰背景、品红 accent、标题居中、正文两端对齐、右下角分页三角。适合学术 / 会议演讲。 |
 
 ## 构建方式
 
 从仓库根目录运行：
 
 ```bash
-# basic 示例 → HTML
-node packages/cli/bin/mddeck.js examples/basic.md -o examples/basic.html
+# 任意示例 → HTML
+node packages/cli/bin/mddeck.js examples/<name>.md -o examples/<name>.html
 
 # m2-features + KaTeX 数学 → HTML
 node packages/cli/bin/mddeck.js examples/m2-features.md \
@@ -28,6 +31,24 @@ node packages/cli/bin/mddeck.js examples/basic.md --pdf -o examples/basic.pdf
 # 或用 build 脚本一步完成
 node examples/build.mjs basic.md
 node examples/build-m2.mjs
+```
+
+### 主题
+
+三个主题示例展示了每个内置主题的视觉效果。主题通过 front-matter `theme:` 指令选择（不需要 CLI flag）。并列运行试试：
+
+```bash
+node packages/cli/bin/mddeck.js examples/theme-default.md  -o examples/theme-default.html
+node packages/cli/bin/mddeck.js examples/theme-gaia.md     -o examples/theme-gaia.html
+node packages/cli/bin/mddeck.js examples/theme-uncover.md  -o examples/theme-uncover.html
+```
+
+自定义主题：写自己的 CSS 文件，通过 `--theme` 传入：
+
+```bash
+node packages/cli/bin/mddeck.js examples/basic.md \
+  --theme ./my-custom-theme.css \
+  -o examples/basic.html
 ```
 
 生成的 `.html` 文件已被 `.gitignore` 忽略 —— 它们应该在本地测试时
