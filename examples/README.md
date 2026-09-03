@@ -12,6 +12,8 @@ This directory contains ready-made Markdown decks you can build and study.
 | [`theme-gaia.md`](./theme-gaia.md) | The `gaia` built-in theme — bold blue gradient, gold accents, centered content, shadowed h1. Best for keynote-style stage presentations. |
 | [`theme-uncover.md`](./theme-uncover.md) | The `uncover` built-in theme — light gray background, magenta accent, centered headings, justified body, pagination triangle. Best for academic / conference talks. |
 | [`theme-impress.md`](./theme-impress.md) | The `impress` built-in theme — modeled on the [official impress.js demo](https://impress.js.org/): white slide cards, soft gray radial-gradient canvas, PT Sans / PT Serif typography. Press **Esc** to exit fullscreen, **P** for the speaker console. |
+| [`theme-impress-flat.md`](./theme-impress-flat.md) | Like `impress` but without the 1px border or rounded corners — the white card still has a subtle drop shadow, so it keeps a hint of depth. |
+| [`theme-impress-bare.md`](./theme-impress-bare.md) | Like `impress-flat` but the slide is fully transparent (no card, no shadow) — text floats directly on the canvas, like a single "type-as-art" headline. |
 
 ## Building them
 

@@ -12,6 +12,8 @@ import defaultThemeCss from './default.js'
 import gaiaThemeCss from './gaia.js'
 import uncoverThemeCss from './uncover.js'
 import impressThemeCss from './impress.js'
+import impressFlatThemeCss from './impress-flat.js'
+import impressBareThemeCss from './impress-bare.js'
 
 export interface MddeckTheme {
   name: string
@@ -24,6 +26,8 @@ export const builtinThemes: MddeckTheme[] = [
   { name: 'gaia', css: gaiaThemeCss },
   { name: 'uncover', css: uncoverThemeCss },
   { name: 'impress', css: impressThemeCss },
+  { name: 'impress-flat', css: impressFlatThemeCss },
+  { name: 'impress-bare', css: impressBareThemeCss },
 ]
 
 /** The scaffold CSS that gets prepended to every theme's CSS. */

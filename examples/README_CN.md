@@ -12,6 +12,8 @@
 | [`theme-gaia.md`](./theme-gaia.md) | 内置 `gaia` 主题 —— 大胆的蓝色渐变、金色 accent、居中内容、带阴影的 h1。适合 keynote 风格的舞台演讲。 |
 | [`theme-uncover.md`](./theme-uncover.md) | 内置 `uncover` 主题 —— 浅灰背景、品红 accent、标题居中、正文两端对齐、右下角分页三角。适合学术 / 会议演讲。 |
 | [`theme-impress.md`](./theme-impress.md) | 内置 `impress` 主题 —— 复刻[官方 impress.js 演示](https://impress.js.org/)：白底卡片、柔和的径向渐变背景、PT Sans / PT Serif 字体。按 **Esc** 退出全屏，**P** 打开演讲者控制台。 |
+| [`theme-impress-flat.md`](./theme-impress-flat.md) | 类似 `impress`,但去掉了 1px 边框和圆角 —— 白卡仍带轻微的 drop shadow,保留一点深度感。 |
+| [`theme-impress-bare.md`](./theme-impress-bare.md) | 类似 `impress-flat`,但 slide 完全透明(无卡、无阴影) —— 文字直接浮在 canvas 上,像排版艺术。 |
 
 ## 构建方式
 
