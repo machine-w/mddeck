@@ -15,6 +15,7 @@ import type { MdDeckOptions } from '@machine-w/mddeck-core'
 
 import { File } from './file.js'
 import { renderImpressTemplate } from './templates/impress/layout.js'
+import { loadKatexCss } from './utils/katex-css.js'
 
 export type ConvertType = 'html' | 'pdf'
 
@@ -154,12 +155,43 @@ export class Converter {
   async convertToHtml(file: File, markdown: string): Promise<string> {
     const out = file.outputPath(this.options.output, '.html')
     const deck = new MdDeck(this.options)
+    const extraCss = this.buildExtraCss(deck)
     const html = await renderImpressTemplate(deck, markdown, {
       title: file.path ? file.path.replace(/^.*\//, '').replace(/\.md$/, '') : undefined,
+      extraCss,
     })
     await mkdir(dirname(out), { recursive: true })
     await writeFile(out, html, 'utf-8')
     return out
+  }
+
+  /**
+   * Build the extraCss payload to inject into the HTML's <style> block.
+   *
+   * Today the only thing it injects is the self-inlined katex.min.css
+   * (with font URLs replaced by base64 data: URIs) when math: katex is
+   * active. Without this, the MathML <math> element shows as plain
+   * text alongside the rendered katex-html output, making every formula
+   * look duplicated. See ./utils/katex-css.ts for the loader.
+   */
+  private buildExtraCss(deck: MdDeck): string {
+    // The math option is stored on the marpit instance by MdDeck's
+    // constructor — there's no public `options.math` accessor.
+    const math = (deck as any)._mddeckMathOption
+    if (math !== 'katex') return ''
+    const css = loadKatexCss()
+    if (css == null) {
+      // katex npm package not installed in the consumer's project.
+      // Surface a console warning so the user knows the formulas will
+      // render twice (the m2-features.html bug) until they install it.
+      console.warn(
+        '⚠ math: katex is set but the `katex` package is not installed.\n' +
+          '  Run `npm install katex` (or `yarn add katex`) to get self-contained math rendering.\n' +
+          '  Falling back to duplicated-MathML output.',
+      )
+      return ''
+    }
+    return `\n/* KaTeX stylesheet (auto-inlined by mddeck CLI) */\n${css}\n`
   }
 
   /** Render markdown → PDF via puppeteer-core + headless Chromium. */

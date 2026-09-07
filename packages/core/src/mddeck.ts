@@ -23,6 +23,7 @@ import { mddeckImpress } from './markdown/impress.js'
 import { registerDirectives } from './markdown/directives.js'
 import { autoLayoutPlugin } from './markdown/auto_layout.js'
 import { printModePlugin } from './markdown/print_mode.js'
+import { backgroundSplitPlugin } from './markdown/background_split.js'
 import stepReplacePostcss from './postcss/step_replace.js'
 import scaffoldInjectPostcss from './postcss/scaffold_inject.js'
 import scopeFlattenPostcss from './postcss/scope_flatten.js'
@@ -96,6 +97,14 @@ export class MdDeck extends MarpitBase {
       slideContainer: [mddeckSlideContainer],
       printable: opts.printable ?? false,
       looseYAML: true,
+      // Enable markdown-it GFM features that Marpit's `commonmark` preset
+      // leaves off. Without `tables: true`, GFM pipe-table syntax in the
+      // user's markdown is silently rendered as plain paragraphs (which
+      // is why the summary slide in `examples/images-demo.md` showed the
+      // table on a single paragraph). `html: false` is what we want for
+      // security — the html.ts allowlist sanitizer below re-enables the
+      // safe subset.
+      markdown: { html: false, tables: true, breaks: false, linkify: false },
       // Enable CSS nesting so Marpit emits modern nested selectors for
       // theme rules instead of descendant-combinator rewrites (e.g.
       // '.step .step' which requires nested <section> elements, a
@@ -135,6 +144,10 @@ export class MdDeck extends MarpitBase {
 
     // Install impress plugin (rewrites <section> → <div class="step">)
     this.use(mddeckImpress)
+
+    // Install background_split (honors `![bg left:N%]` even with
+    // inlineSVG disabled — see markdown/background_split.ts)
+    this.use(backgroundSplitPlugin)
 
     // Install auto-layout (assigns positions to steps without explicit pos)
     if (opts.autoLayout !== false) this.use(autoLayoutPlugin)
@@ -304,6 +317,21 @@ export class MdDeck extends MarpitBase {
   }> {
     await this.#loadMathLibIfNeeded()
     const result = super.render(markdown, env)
+    // Sync front-matter `width:` / `height:` / `perspective:` directives
+    // into sizeInfo. These directives are parsed by Marpit and stored on
+    // lastGlobalDirectives, but the CLI template reads from sizeInfo —
+    // if we don't sync, the user's front-matter values are silently
+    // ignored and the hardcoded defaults win. (See the long comment
+    // in directives.ts: `perspective: 0` is supposed to disable 3D.)
+    const global: any = (this as any).lastGlobalDirectives ?? {}
+    if (typeof global.width === 'number') this.sizeInfo.width = global.width
+    if (typeof global.height === 'number') this.sizeInfo.height = global.height
+    if (typeof global.perspective === 'number') {
+      // `perspective: 0` means "disable 3D" — but impress.js divides by
+      // perspective (effectively dividing by zero), so we substitute a very
+      // large value to flatten the projection without breaking render.
+      this.sizeInfo.perspective = global.perspective === 0 ? 1e9 : global.perspective
+    }
     return {
       html: Array.isArray(result.html) ? result.html.join('\n') : result.html,
       css: result.css,

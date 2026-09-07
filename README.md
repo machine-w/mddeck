@@ -303,9 +303,31 @@ yarn test
 # Build the basic example
 node packages/cli/bin/mddeck.js examples/basic.md -o /tmp/basic.html
 
+# Build the image-feature example (13 slides demonstrating every image syntax)
+node packages/cli/bin/mddeck.js examples/images-demo.md -o /tmp/images-demo.html
+
+# Build the gaia-theme variant
+node packages/cli/bin/mddeck.js examples/images-gaia.md -o /tmp/images-gaia.html
+
+# Build the math formula example (auto-inlines KaTeX CSS + fonts)
+node packages/cli/bin/mddeck.js examples/math-demo.md \
+  --math katex -o /tmp/math-demo.html
+
 # Run the headless browser verification (requires playwright + chromium)
 node examples/build-m2.mjs
 ```
+
+### Math formulas (KaTeX)
+
+The CLI auto-inlines the entire `katex.min.css` (with all 60 font files
+base64-encoded as `data:` URIs) when `--math katex` is used. The resulting
+HTML is a single self-contained file — no `katex.css` to copy, no
+`fonts/` directory to ship alongside. Just make sure the consumer
+project has `katex` installed (`npm install katex`).
+
+If katex isn't installed and you still pass `--math katex`, the CLI
+prints a warning and falls back to raw LaTeX (formulas will render
+twice, once as MathML and once as text).
 
 ### Project structure (internals)
 
