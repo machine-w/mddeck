@@ -81,7 +81,7 @@ Open the browser, press **P**, and the speaker console window
 shows the content below attached to this slide.
 
 <!--
-note: |
+_note: |
   ### Speaker notes for this slide
 
   - The speaker console keeps your audience on the main deck while
@@ -91,6 +91,16 @@ note: |
   - Links work too: [impress.js](https://impress.js.org/) — and so
     does `inline code` and fenced blocks.
 -->
+
+---
+
+# Thank you
+
+That's the whole deck. Press **P** at any slide to open the
+speaker notes for the current step. Notes are written via the
+`_note:` directive in an HTML comment, using **plain markdown**
+(no raw HTML in the notes value). See
+[`examples/basic.md`](./basic.md) for the directive syntax.
 
 ---
 

@@ -18,7 +18,16 @@
  * plugin runs.
  */
 
+import MarkdownIt from 'markdown-it'
 import { marpitPlugin } from './marpit_plugin.js'
+
+// Reuse a plain markdown-it instance (NOT the marpit subclass) to render
+// speaker note values. Marpit's `render()` is overridden to ignore its
+// `src` argument and re-render the last slide tokens — useless for
+// arbitrary note strings — and its renderer also wraps the result in
+// `<div class="marpit mddeck">…</div>`. A plain MarkdownIt gives us a
+// clean render of just the note content.
+const noteParser = new MarkdownIt({ html: true, linkify: true, typographer: true })
 
 /**
  * Maps a directive key to the corresponding impress.js data-* attribute.
@@ -90,7 +99,8 @@ function _impress(md: any): void {
       if (state.inlineMode) return
       let stepIndex = 0
 
-      for (const token of state.tokens) {
+      for (let i = 0; i < state.tokens.length; i++) {
+        const token = state.tokens[i]
         if (token.meta?.marpitSlideElement !== 1) {
           // close token: also rewrite tag
           if (token.meta?.marpitSlideElement === -1) token.tag = 'div'
@@ -137,22 +147,30 @@ function _impress(md: any): void {
           token.attrSet(attr, String(value))
         }
 
-        // 5. Speaker notes — render the directive value as Markdown, then
+        // 5. Speaker notes — render the directive value as Markdown via
+        //    a plain markdown-it instance (we can't use `md.render` here
+        //    because marpit's override re-renders the whole deck), then
         //    wrap the rendered HTML in <div class="notes">…</div> and
-        //    append it to the step. impress.js's speaker console (P key)
-        //    reads this div and shows its innerHTML in a separate
-        //    window. Running the value through state.md.render() gives
-        //    the user full markdown syntax in notes (bold / lists /
-        //    links / code blocks) without them having to write raw
-        //    HTML in their .md file. The marpit pipeline still applies
-        //    its XSS allowlist to the rendered output, so a note
-        //    like '![x](javascript:alert(1))' is safely stripped.
+        //    insert it as a sibling body token *before* the slide's
+        //    close token. Pushing it onto the open token's children
+        //    doesn't work because marpit's wrap_tokens places the body
+        //    content as siblings of the open/close pair, not inside
+        //    them.
         const note: string | undefined = dir.note
         if (note) {
-          const noteHtml = state.md.render(note)
+          const noteHtml = noteParser.render(note)
           const noteToken = new state.Token('html_block', '', 0)
           noteToken.content = `<div class="notes">${noteHtml}</div>\n`
-          token.children.push(noteToken)
+          // Find this slide's close token (marpitSlideElement: -1, the
+          // token immediately following the slide body). Insert the
+          // noteToken just before it so it renders as the last child
+          // of the slide body.
+          for (let j = i + 1; j < state.tokens.length; j++) {
+            if (state.tokens[j].meta?.marpitSlideElement === -1) {
+              state.tokens.splice(j, 0, noteToken)
+              break
+            }
+          }
         }
       }
     },
