@@ -91,6 +91,16 @@ export class MdDeck extends MarpitBase {
     perspective: 1000,
   }
 
+  /** Resolved math engine for this deck ('katex' | 'mathjax' | false).
+   *  Mirrors `opts.math` for CLI / VSCode consumers — the underlying
+   *  marpit instance stores this on its own private `_mddeckMathOption`
+   *  field, but reading it through a public getter avoids forcing
+   *  every consumer to traverse `deck.marpit` (TypeScript would also
+   *  complain about a protected / private field). */
+  public get mathOption(): false | 'mathjax' | 'katex' | mathPlugin.MathOptions {
+    return (this as any).marpit?._mddeckMathOption ?? false
+  }
+
   constructor(opts: MdDeckOptions = {}) {
     super({
       container: [mddeckContainer],
