@@ -106,6 +106,37 @@ body.mddeck-overview .step {
   left: 0 !important;
   pointer-events: none;
 }
+
+/* Speaker notes (the '_note:' directive) live inside the slide
+   body so impress.js's speaker console can read them. Hide them
+   from the audience on the main stage. */
+.notes { display: none; }
+
+/* Marpit's "![bg left:N%](image)" / "right:N%" layout sets a
+   background-image on the step with background-position and a
+   background-size ending in '% 100%'. The text would otherwise sit
+   on top of the image — pad the matching side so the text flows
+   beside the image. This is a best-effort rule that matches the
+   inline style; for unusual widths the user can override the slide
+   style directly. */
+.step[style*="background-position: left"]:not([style*="background-size: cover"]):not([style*="background-size: contain"]),
+.step[style*="background-position: 0%"]:not([style*="background-size: cover"]):not([style*="background-size: contain"]) {
+  /* Use vw rather than % because the step's containing block has 0
+     width (it's an inline-flow div with width set on the step itself).
+     The slide's design width is 1920px, so 33vw = 633.6px, which
+     matches the 33% bg-size in the original 1920x1080 coordinate system. */
+  padding-left: 33vw !important;
+  background-repeat: no-repeat !important;
+  background-size: 33% 100% !important;
+  background-position: left center !important;
+}
+.step[style*="background-position: right"]:not([style*="background-size: cover"]):not([style*="background-size: contain"]),
+.step[style*="background-position: 100%"]:not([style*="background-size: cover"]):not([style*="background-size: contain"]) {
+  padding-right: 33vw !important;
+  background-repeat: no-repeat !important;
+  background-size: 33% 100% !important;
+  background-position: right center !important;
+}
 </style>
 </head>
 <body class="impress-not-supported">
