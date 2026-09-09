@@ -72,34 +72,32 @@ Use `*` for bullet items that animate in.
 
 # Speaker Notes Demo
 
-This slide has a `<div class="notes">` block. Open the browser, press
-**P**, and a separate speaker console window opens showing the
-content of that block as speaker notes.
+This slide uses the `_note` directive to attach speaker notes
+without writing any raw HTML in the markdown. Open the browser,
+press **P**, and the speaker console window shows the content
+attached to this slide.
 
-<div class="notes">
-<h3>Speaker notes for this slide</h3>
-<ul>
-  <li>Use the speaker console to keep your audience on the main
-      deck while you see your private notes + a preview of the
-      <em>next</em> slide.</li>
-  <li>The console window also has <strong>restart</strong> and
-      <strong>prev</strong> / <strong>next</strong> buttons — same
-      keyboard shortcuts as the main deck (← / → / Space).</li>
-  <li>Time budget for this slide: <strong>2 minutes</strong>. If
-      you're running long, jump to slide 6 (Lists) and wrap up.</li>
-</ul>
-<p>You can use any HTML inside <code>&lt;div class=&quot;notes&quot;&gt;</code>:
-<em>emphasis</em>, <strong>strong</strong>, <code>code</code>,
-<a href="https://impress.js.org/">links</a>, lists, even
-<strong style="color:#b83280">inline colors</strong>.</p>
-<p>Source: see <code>examples/basic.md</code> step 7.</p>
-</div>
+<!--
+note: |
+  <h3>Speaker notes for this slide</h3>
+  <ul>
+    <li>The speaker console keeps your audience on the main deck
+        while you see private notes + a preview of the <em>next</em>
+        slide.</li>
+    <li>Time budget: <strong>2 minutes</strong>. If running long,
+        jump to slide 6 (Lists) and wrap up.</li>
+  </ul>
+  <p>Notes are just HTML — you can use <em>emphasis</em>,
+  <strong>strong</strong>, <code>code</code>,
+  <a href="https://impress.js.org/">links</a>, and lists.</p>
+-->
 
 ---
 
 # Thank you
 
 That's the whole deck. Press **P** at any slide to open the
-speaker notes for the current step. See
-[`examples/basic.md`](./basic.md) for how the notes block is
-written.
+speaker notes for the current step. Notes are written via the
+`_note:` directive in an HTML comment — no raw HTML in the
+markdown body. See [`examples/basic.md`](./basic.md) for the
+directive syntax.

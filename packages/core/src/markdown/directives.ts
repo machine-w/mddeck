@@ -185,6 +185,36 @@ const relToDirective: DirectiveDefinitions[string] = (v) => {
   return s ? { relTo: s } : {}
 }
 
+/**
+ * Per-step speaker notes. The value is written as the inner HTML of a
+ * `<div class="notes">` block that impress.js's speaker console (P key)
+ * reads. Multi-line content goes through a YAML `|` block scalar:
+ *
+ *     <!--
+ *     note: |
+ *       First point.
+ *       Second point.
+ *     -->
+ *
+ * Because the value lives inside an HTML comment, the user can put any
+ * HTML in it without XSS escaping concerns. (We do NOT route it
+ * through the markdown-it `html_block` sanitizer, since that would
+ * destroy the markup.)
+ *
+ * Only one `_note` per slide — Marpit stores directive values in a
+ * plain dict, so multiple `<!-- _note: ... -->` comments would overwrite
+ * each other. Users wanting multiple paragraphs should use a single
+ * `note: |` block with `<p>...</p>` paragraphs inside.
+ */
+const noteDirective: DirectiveDefinitions[string] = (v) => {
+  // parseValue() runs the value through yaml.load, which understands the
+  // YAML '|' block-scalar indicator for multi-line strings. For a single
+  // line, the value passes through unchanged.
+  const parsed = parseValue(v)
+  if (parsed == null || parsed === '') return {}
+  return { note: String(parsed) }
+}
+
 export const localDirectives: DirectiveDefinitions = {
   position: positionDirective,
   rotate: rotateDirective,
@@ -192,6 +222,7 @@ export const localDirectives: DirectiveDefinitions = {
   stepTransitionDuration: stepTransitionDurationDirective,
   relPosition: relPositionDirective,
   relTo: relToDirective,
+  note: noteDirective,
 }
 
 /* ------------------------------------------------------------------ */

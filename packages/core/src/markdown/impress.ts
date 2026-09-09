@@ -66,7 +66,7 @@ const SCALE_KEYS = ['scale'] as const
 const REL_KEYS = ['relPosition', 'relTo', 'relX', 'relY', 'relZ'] as const
 
 /** Directive keys that should be skipped when copying to data-* attributes. */
-const SKIP_KEYS = new Set(['position', 'rotate', 'class'])
+const SKIP_KEYS = new Set(['position', 'rotate', 'class', 'note'])
 
 function applyAttrs(
   token: any,
@@ -135,6 +135,21 @@ function _impress(md: any): void {
           if (value == null || value === '') continue
           const attr = `data-${kebab(key)}`
           token.attrSet(attr, String(value))
+        }
+
+        // 5. Speaker notes — append a <div class="notes">...</div> child
+        //    to the step. impress.js's speaker console (opened by the
+        //    'P' key) reads this div and shows its innerHTML in a
+        //    separate window. We use an html_block token (not a
+        //    normal marpit render path) so the user-supplied HTML is
+        //    injected as-is, without going through the XSS sanitizer
+        //    (the value already comes from inside an HTML comment so
+        //    the user explicitly opted into raw HTML).
+        const note: string | undefined = dir.note
+        if (note) {
+          const noteToken = new state.Token('html_block', '', 0)
+          noteToken.content = `<div class="notes">${note}</div>\n`
+          token.children.push(noteToken)
         }
       }
     },
