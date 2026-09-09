@@ -50,6 +50,13 @@ export const uncoverThemeCss = String.raw`
   border-color: transparent transparent var(--mddeck-accent) transparent;
   opacity: 0.7;
 }
+
+/* Font-size utility classes. */
+.step.tiny   { font-size: 14px; }
+.step.small  { font-size: 20px; }
+.step.normal { font-size: 28px; }
+.step.big    { font-size: 42px; }
+.step.huge   { font-size: 60px; }
 `
 
 export default uncoverThemeCss

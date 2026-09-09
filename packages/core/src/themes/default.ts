@@ -55,6 +55,16 @@ export const defaultThemeCss = String.raw`
 .step a:hover {
   text-decoration: underline;
 }
+
+/* Font-size utility classes. Add <!-- _class: tiny --> (or small /
+   normal / big / huge) on a slide to scale the whole step's text
+   proportionally. The em-based headings in the theme (h1, h2, h3)
+   inherit the step's font-size and scale together. */
+.step.tiny   { font-size: 14px; }
+.step.small  { font-size: 20px; }
+.step.normal { font-size: 28px; }
+.step.big    { font-size: 42px; }
+.step.huge   { font-size: 60px; }
 `
 
 export default defaultThemeCss

@@ -102,12 +102,3 @@ speaker notes for the current step. Notes are written via the
 (no raw HTML in the notes value). See
 [`examples/basic.md`](./basic.md) for the directive syntax.
 
----
-
-# Thank you
-
-That's the whole deck. Press **P** at any slide to open the
-speaker notes for the current step. Notes are written via the
-`_note:` directive in an HTML comment, using **plain markdown**
-(no raw HTML in the notes value). See
-[`examples/basic.md`](./basic.md) for the directive syntax.

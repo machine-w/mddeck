@@ -188,31 +188,35 @@ const relToDirective: DirectiveDefinitions[string] = (v) => {
 /**
  * Per-step speaker notes. The value is written as the inner HTML of a
  * `<div class="notes">` block that impress.js's speaker console (P key)
- * reads. Multi-line content goes through a YAML `|` block scalar:
+ * reads.
  *
+ *     <!-- _note: First point. -->
  *     <!--
  *     note: |
- *       First point.
- *       Second point.
+ *       Multi-line note.
+ *       Second line.
  *     -->
  *
- * Because the value lives inside an HTML comment, the user can put any
- * HTML in it without XSS escaping concerns. (We do NOT route it
- * through the markdown-it `html_block` sanitizer, since that would
- * destroy the markup.)
+ * We deliberately do NOT pass the value through parseValue() / yaml.load:
+ * the only other directives that need it have structured payloads
+ * (numbers, objects like `{ x: 1500, y: 0 }`), so yaml.load is helpful
+ * there. For raw markdown text, yaml.load is harmful: it collapses
+ * `\n` into a single space for plain strings ("line 1\nline 2" →
+ * "line 1 line 2") and throws a YAMLException for a stray `|`
+ * indicator. Either way, the result is broken. The right behaviour is
+ * to pass Marpit's already-extracted value through unchanged.
  *
- * Only one `_note` per slide — Marpit stores directive values in a
- * plain dict, so multiple `<!-- _note: ... -->` comments would overwrite
- * each other. Users wanting multiple paragraphs should use a single
- * `note: |` block with `<p>...</p>` paragraphs inside.
+ * Because the value lives inside an HTML comment, the user can put
+ * any HTML in it without XSS escaping concerns. (The impress plugin
+ * routes the final HTML through marpit's XSS allowlist on the way
+ * out — which the user has explicitly opted into by writing the
+ * value in a comment.)
  */
 const noteDirective: DirectiveDefinitions[string] = (v) => {
-  // parseValue() runs the value through yaml.load, which understands the
-  // YAML '|' block-scalar indicator for multi-line strings. For a single
-  // line, the value passes through unchanged.
-  const parsed = parseValue(v)
-  if (parsed == null || parsed === '') return {}
-  return { note: String(parsed) }
+  if (v == null) return {}
+  const s = String(v)
+  if (s === '') return {}
+  return { note: s }
 }
 
 export const localDirectives: DirectiveDefinitions = {

@@ -87,6 +87,8 @@ transitionDuration: 600
 `cover` 把图等比缩放到铺满整个画布 —— 多余部分被裁切。
 1920×1080 的画布在 16:9 屏上看起来完美。
 
+---
+
 ![bg contain](media/cover-1920x1085.jpg)
 
 # contain 模式
@@ -173,6 +175,7 @@ transitionDuration: 600
 
 <!-- _backgroundColor: "#0d1117" -->
 <!-- _color: white -->
+<!-- _class: small -->
 
 ## 致谢
 

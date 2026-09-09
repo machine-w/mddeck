@@ -19,6 +19,38 @@ This directory contains ready-made Markdown decks you can build and study.
 | [`theme-impress-bare.md`](./theme-impress-bare.md) | Like `impress-flat` but the slide is fully transparent (no card, no shadow) — text floats directly on the canvas, like a single "type-as-art" headline. |
 | [`t.md`](./t.md) | Tiny 2-slide smoke test — the smallest possible deck. Used to confirm the build pipeline works end-to-end without writing 20+ slides. |
 
+
+## Font-size utility classes
+
+All six built-in themes ship five utility classes that scale the
+whole slide's text proportionally. Add `<!-- _class: name -->` at
+the top of any slide to apply:
+
+| Class | Slide `font-size` | Use case |
+|---|---|---|
+| `tiny` | 14px | Footer footnotes, image credits, slide-end reminders |
+| `small` | 20px | Dense content (long lists, code-heavy slides) |
+| `normal` | 28px | Default — restore a slide to standard size after a `tiny`/`huge` slide |
+| `big` | 42px | Title slides, key statements, callouts |
+| `huge` | 60px | Hero slides, single-word / single-phrase impact |
+
+Because every theme's headings (`h1`, `h2`, `h3`, `code`) use `em`
+units relative to the step's `font-size`, scaling the step scales
+the whole text proportionally. Example:
+
+```markdown
+<!-- _class: small -->
+
+## This whole slide is rendered at 20px
+
+- Lists and code inherit the smaller size
+- Good for dense reference slides
+```
+
+The class is applied via Marpit's local `<!-- _class: ... -->` directive,
+so the same class name works in all six themes.
+
+
 ## Building them
 
 From the repository root:

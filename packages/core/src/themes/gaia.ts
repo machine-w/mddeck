@@ -47,6 +47,13 @@ export const gaiaThemeCss = String.raw`
   background: rgba(255,255,255,0.1);
   color: #ffd66e;
 }
+
+/* Font-size utility classes. */
+.step.tiny   { font-size: 14px; }
+.step.small  { font-size: 20px; }
+.step.normal { font-size: 28px; }
+.step.big    { font-size: 42px; }
+.step.huge   { font-size: 60px; }
 `
 
 export default gaiaThemeCss
