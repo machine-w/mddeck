@@ -34,14 +34,16 @@ This slide is above and rotated 90° around the Z axis.
 ---
 
 <!--
-_position: { x: -1500, y: 0, z: -2000 }
-_rotate: { x: -30, y: 20, z: 0 }
-_scale: 2
+_position: { x: -1500, y: 0, z: -800 }
+_rotate: { x: -15, y: 10, z: 0 }
+_scale: 1.5
 -->
 
 # Deep 3D
 
-This slide uses **scale: 2**, **x: -1500**, **y: 0**, **z: -2000**, and rotation around X and Y axes.
+This slide uses **scale: 1.5**, **x: -1500**, **y: 0**, **z: -800**, and
+mild rotation around the X and Y axes — enough to show off the 3D
+effect while keeping the slide comfortably inside the viewport.
 
 ---
 
