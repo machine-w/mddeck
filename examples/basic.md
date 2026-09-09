@@ -73,23 +73,23 @@ Use `*` for bullet items that animate in.
 # Speaker Notes Demo
 
 This slide uses the `_note` directive to attach speaker notes
-without writing any raw HTML in the markdown. Open the browser,
-press **P**, and the speaker console window shows the content
-attached to this slide.
+without writing any raw HTML in the markdown. The note value is
+rendered as Markdown, so you can use the same syntax you already
+know.
+
+Open the browser, press **P**, and the speaker console window
+shows the content below attached to this slide.
 
 <!--
 note: |
-  <h3>Speaker notes for this slide</h3>
-  <ul>
-    <li>The speaker console keeps your audience on the main deck
-        while you see private notes + a preview of the <em>next</em>
-        slide.</li>
-    <li>Time budget: <strong>2 minutes</strong>. If running long,
-        jump to slide 6 (Lists) and wrap up.</li>
-  </ul>
-  <p>Notes are just HTML — you can use <em>emphasis</em>,
-  <strong>strong</strong>, <code>code</code>,
-  <a href="https://impress.js.org/">links</a>, and lists.</p>
+  ### Speaker notes for this slide
+
+  - The speaker console keeps your audience on the main deck while
+    you see private notes and a preview of the *next* slide.
+  - Time budget: **2 minutes**. If running long, jump to slide 6
+    (Lists) and wrap up.
+  - Links work too: [impress.js](https://impress.js.org/) — and so
+    does `inline code` and fenced blocks.
 -->
 
 ---
@@ -98,6 +98,6 @@ note: |
 
 That's the whole deck. Press **P** at any slide to open the
 speaker notes for the current step. Notes are written via the
-`_note:` directive in an HTML comment — no raw HTML in the
-markdown body. See [`examples/basic.md`](./basic.md) for the
-directive syntax.
+`_note:` directive in an HTML comment, using **plain markdown**
+(no raw HTML in the notes value). See
+[`examples/basic.md`](./basic.md) for the directive syntax.

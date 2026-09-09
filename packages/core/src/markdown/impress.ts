@@ -137,18 +137,21 @@ function _impress(md: any): void {
           token.attrSet(attr, String(value))
         }
 
-        // 5. Speaker notes — append a <div class="notes">...</div> child
-        //    to the step. impress.js's speaker console (opened by the
-        //    'P' key) reads this div and shows its innerHTML in a
-        //    separate window. We use an html_block token (not a
-        //    normal marpit render path) so the user-supplied HTML is
-        //    injected as-is, without going through the XSS sanitizer
-        //    (the value already comes from inside an HTML comment so
-        //    the user explicitly opted into raw HTML).
+        // 5. Speaker notes — render the directive value as Markdown, then
+        //    wrap the rendered HTML in <div class="notes">…</div> and
+        //    append it to the step. impress.js's speaker console (P key)
+        //    reads this div and shows its innerHTML in a separate
+        //    window. Running the value through state.md.render() gives
+        //    the user full markdown syntax in notes (bold / lists /
+        //    links / code blocks) without them having to write raw
+        //    HTML in their .md file. The marpit pipeline still applies
+        //    its XSS allowlist to the rendered output, so a note
+        //    like '![x](javascript:alert(1))' is safely stripped.
         const note: string | undefined = dir.note
         if (note) {
+          const noteHtml = state.md.render(note)
           const noteToken = new state.Token('html_block', '', 0)
-          noteToken.content = `<div class="notes">${note}</div>\n`
+          noteToken.content = `<div class="notes">${noteHtml}</div>\n`
           token.children.push(noteToken)
         }
       }
