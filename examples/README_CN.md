@@ -17,6 +17,7 @@
 | [`theme-impress.md`](./theme-impress.md) | 内置 `impress` 主题 —— 复刻[官方 impress.js 演示](https://impress.js.org/)：白底卡片、柔和的径向渐变背景、PT Sans / PT Serif 字体。按 **Esc** 退出全屏，**P** 打开演讲者控制台。 |
 | [`theme-impress-flat.md`](./theme-impress-flat.md) | 类似 `impress`,但去掉了 1px 边框和圆角 —— 白卡仍带轻微的 drop shadow,保留一点深度感。 |
 | [`theme-impress-bare.md`](./theme-impress-bare.md) | 类似 `impress-flat`,但 slide 完全透明(无卡、无阴影) —— 文字直接浮在 canvas 上,像排版艺术。 |
+| [`t.md`](./t.md) | 最简 2 张幻灯片 —— smoke test,确认构建管线端到端能跑。 |
 
 ## `media/` 目录
 
@@ -79,12 +80,17 @@ npm install katex   # 或 yarn add katex
 
 ### 主题
 
-三个主题示例展示了每个内置主题的视觉效果。主题通过 front-matter `theme:` 指令选择（不需要 CLI flag）。并列运行试试：
+六个主题示例 + 两个图片示例展示了每个内置主题的视觉效果。主题通过 front-matter `theme:` 指令选择（不需要 CLI flag）。并列运行试试：
 
 ```bash
-node packages/cli/bin/mddeck.js examples/theme-default.md  -o examples/theme-default.html
-node packages/cli/bin/mddeck.js examples/theme-gaia.md     -o examples/theme-gaia.html
-node packages/cli/bin/mddeck.js examples/theme-uncover.md  -o examples/theme-uncover.html
+node packages/cli/bin/mddeck.js examples/theme-default.md        -o examples/theme-default.html
+node packages/cli/bin/mddeck.js examples/theme-gaia.md           -o examples/theme-gaia.html
+node packages/cli/bin/mddeck.js examples/theme-uncover.md        -o examples/theme-uncover.html
+node packages/cli/bin/mddeck.js examples/theme-impress.md        -o examples/theme-impress.html
+node packages/cli/bin/mddeck.js examples/theme-impress-flat.md   -o examples/theme-impress-flat.html
+node packages/cli/bin/mddeck.js examples/theme-impress-bare.md   -o examples/theme-impress-bare.html
+node packages/cli/bin/mddeck.js examples/images-demo.md          -o examples/images-demo.html
+node packages/cli/bin/mddeck.js examples/images-gaia.md          -o examples/images-gaia.html
 ```
 
 自定义主题：写自己的 CSS 文件，通过 `--theme` 传入：

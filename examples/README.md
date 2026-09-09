@@ -7,13 +7,17 @@ This directory contains ready-made Markdown decks you can build and study.
 | File | Description |
 |---|---|
 | [`basic.md`](./basic.md) | A minimal 6-slide deck showcasing the basic 3D positioning directives. No math, no emoji — just the core syntax. |
-| [`m2-features.md`](./m2-features.md) | Demos KaTeX math (inline + block), twemoji (shortcodes + unicode), and HTML sanitization (XSS test). Use this as a regression test for the M2 features. |
+| [`m2-features.md`](./m2-features.md) | Demos KaTeX math (inline + block), twemoji (shortcodes + unicode), and HTML sanitization (XSS test). Use this as a regression test for the M2 features. Requires `--math katex` to build. |
+| [`math-demo.md`](./math-demo.md) | A thorough tour of mddeck's KaTeX math support — inline / block formulas, fractions, roots, sums / integrals / limits, matrices, aligned multi-line equations, piecewise functions, probability, and a few famous formulas. All Chinese content. Requires `--math katex`. |
+| [`images-demo.md`](./images-demo.md) | The 5 image syntaxes mddeck supports: `<!-- _backgroundImage: url() -->` directives, the `![bg](image)` shortcut, `![bg left:N%]` split layouts, `opacity` and `blur` filters, and 2×2 grids via markdown tables. All Chinese content. Uses `perspective: 0` for flat slide transitions. |
+| [`images-gaia.md`](./images-gaia.md) | Same image features as `images-demo.md` but with the `gaia` theme to show how the same content looks under a different visual style. All Chinese content. |
 | [`theme-default.md`](./theme-default.md) | The `default` built-in theme — GitHub-flavored look, blue accent, left-aligned. Best for engineering reviews and technical talks. |
 | [`theme-gaia.md`](./theme-gaia.md) | The `gaia` built-in theme — bold blue gradient, gold accents, centered content, shadowed h1. Best for keynote-style stage presentations. |
 | [`theme-uncover.md`](./theme-uncover.md) | The `uncover` built-in theme — light gray background, magenta accent, centered headings, justified body, pagination triangle. Best for academic / conference talks. |
 | [`theme-impress.md`](./theme-impress.md) | The `impress` built-in theme — modeled on the [official impress.js demo](https://impress.js.org/): white slide cards, soft gray radial-gradient canvas, PT Sans / PT Serif typography. Press **Esc** to exit fullscreen, **P** for the speaker console. |
 | [`theme-impress-flat.md`](./theme-impress-flat.md) | Like `impress` but without the 1px border or rounded corners — the white card still has a subtle drop shadow, so it keeps a hint of depth. |
 | [`theme-impress-bare.md`](./theme-impress-bare.md) | Like `impress-flat` but the slide is fully transparent (no card, no shadow) — text floats directly on the canvas, like a single "type-as-art" headline. |
+| [`t.md`](./t.md) | Tiny 2-slide smoke test — the smallest possible deck. Used to confirm the build pipeline works end-to-end without writing 20+ slides. |
 
 ## Building them
 
@@ -31,22 +35,27 @@ node packages/cli/bin/mddeck.js examples/m2-features.md \
 # Build with PDF output
 node packages/cli/bin/mddeck.js examples/basic.md --pdf -o examples/basic.pdf
 
-# Or use the build script which handles all of the above
-node examples/build.mjs basic.md
-node examples/build-m2.mjs
+# Build KaTeX demos (m2-features, math-demo)
+node packages/cli/bin/mddeck.js examples/m2-features.md --math katex -o examples/m2-features.html
+node packages/cli/bin/mddeck.js examples/math-demo.md   --math katex -o examples/math-demo.html
 ```
 
 ### Themes
 
-The three theme examples show off the visual style of each built-in
-theme. The theme is selected via the front-matter `theme:` directive
-(no CLI flag needed). Try them side by side:
+The six theme examples + two image examples show off the visual
+style of each built-in theme. The theme is selected via the
+front-matter `theme:` directive (no CLI flag needed). Try them side by
+side:
 
 ```bash
-node packages/cli/bin/mddeck.js examples/theme-default.md  -o examples/theme-default.html
-node packages/cli/bin/mddeck.js examples/theme-gaia.md     -o examples/theme-gaia.html
-node packages/cli/bin/mddeck.js examples/theme-uncover.md  -o examples/theme-uncover.html
-node packages/cli/bin/mddeck.js examples/theme-impress.md  -o examples/theme-impress.html
+node packages/cli/bin/mddeck.js examples/theme-default.md        -o examples/theme-default.html
+node packages/cli/bin/mddeck.js examples/theme-gaia.md           -o examples/theme-gaia.html
+node packages/cli/bin/mddeck.js examples/theme-uncover.md        -o examples/theme-uncover.html
+node packages/cli/bin/mddeck.js examples/theme-impress.md        -o examples/theme-impress.html
+node packages/cli/bin/mddeck.js examples/theme-impress-flat.md   -o examples/theme-impress-flat.html
+node packages/cli/bin/mddeck.js examples/theme-impress-bare.md   -o examples/theme-impress-bare.html
+node packages/cli/bin/mddeck.js examples/images-demo.md          -o examples/images-demo.html
+node packages/cli/bin/mddeck.js examples/images-gaia.md          -o examples/images-gaia.html
 ```
 
 For a custom theme, write your own CSS file and pass it via `--theme`:
