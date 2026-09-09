@@ -4,7 +4,11 @@ import type { SafeAttrValueHandler, IWhiteList } from 'xss'
 import type { HTMLAllowList } from './allowlist.js'
 
 // NOTE: Rolldown MJS build will fail if used named import directly
-const { FilterXSS, friendlyAttrValue, escapeAttrValue } = xss
+// xss 1.0.15 only exports FilterXSS as default; `friendlyAttrValue` and
+// `escapeAttrValue` were dropped — the FilterXSS class now does entity
+// parsing + escaping internally, so safeAttrValue is only used for
+// user-supplied per-tag/per-attr transformers.
+const { FilterXSS } = xss
 
 const selfClosingRegexp = /\s*\/?>$/
 const xhtmlOutFilter = new FilterXSS({
@@ -62,18 +66,20 @@ export function markdown(md): void {
   const generateSafeAttrValueHandler =
     (html = fetchHtmlOption()): SafeAttrValueHandler =>
     (tag, attr, value) => {
-      let ret = friendlyAttrValue(value)
-
+      // xss 1.0.15 handles entity parsing + escaping internally before
+      // invoking safeAttrValue, so we only need to apply the user-
+      // supplied per-tag/per-attr transformer (if any) and pass the
+      // value through. The result is fed back into FilterXSS which
+      // escapes special chars in the surrounding attribute.
       if (
         typeof html === 'object' &&
         html[tag] &&
         !Array.isArray(html[tag]) &&
         typeof html[tag][attr] === 'function'
       ) {
-        ret = html[tag][attr](ret)
+        return html[tag][attr](value)
       }
-
-      return escapeAttrValue(ret)
+      return value
     }
 
   const sanitize = (ret: string) => {
@@ -107,7 +113,7 @@ export function markdown(md): void {
         allowList: { script: scriptAllowAttrs || [] },
         allowCommentTag: true,
         onIgnoreTagAttr: (_, name, value) => {
-          if (html === true) return `${name}="${escapeAttrValue(value)}"`
+          if (html === true) return `${name}="${value.replace(/"/g, '&quot;')}"`
           return undefined
         },
         escapeHtml: (s) => s,
