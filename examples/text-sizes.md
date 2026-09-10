@@ -19,6 +19,8 @@ without changing the rest of the deck.
 Press space / arrow keys to step through.
 -->
 
+<!-- _class: tiny -->
+
 # Text-size utility classes
 
 mddeck ships **5 utility classes** in every built-in theme that scale

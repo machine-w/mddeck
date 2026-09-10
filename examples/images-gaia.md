@@ -5,7 +5,7 @@ height: 1080
 perspective: 0
 transitionDuration: 600
 ---
-
+<!-- _class: small -->
 ![bg opacity:0.25](media/cover-1920x1085.jpg)
 
 # mddeck × gaia 主题 × 图片
@@ -19,6 +19,7 @@ transitionDuration: 600
 > 本示例用了 `perspective: 0` —— 幻灯片间是平面平铺切换。
 
 ---
+<!-- _class: small -->
 
 ![bg left:40%](media/photo4.jpg)
 
@@ -48,7 +49,7 @@ gaia 主题的标题是金色，居中，有阴影。
 > （参见 `images-demo.md` 的"3D 联动"那一节。）
 
 ---
-
+<!-- _class: small -->
 # 资源清单
 
 | 资源 | 用途 |
@@ -57,10 +58,3 @@ gaia 主题的标题是金色，居中，有阴影。
 | `examples/images-gaia.md` | gaia 主题变体（当前页） |
 | `examples/media/*.jpg` | 测试用的图片（来自 ~/图片/） |
 | `examples/images-*.html` | 已生成的 HTML，可以直接在浏览器打开 |
-
-```bash
-# 重新构建本示例
-node packages/cli/bin/mddeck.js \
-  examples/images-gaia.md \
-  -o examples/images-gaia.html
-```

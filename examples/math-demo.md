@@ -6,7 +6,7 @@ height: 1080
 perspective: 0
 transitionDuration: 600
 ---
-
+<!-- _class: small -->
 # 数学公式 :tada:
 
 用 Markdown 写带数学公式的幻灯片 —— 靠 **KaTeX** 渲染。
@@ -39,7 +39,7 @@ transitionDuration: 600
 `$...$` 两个美元符号包裹的就是行内公式，会渲染成 HTML 而不是 LaTeX 源码。
 
 ---
-
+<!-- _class: small -->
 # 块级公式
 
 块级公式独占一行，居中显示：
@@ -55,6 +55,7 @@ $$
 `$$...$$` 两个美元符号独占一行的就是块级公式。
 
 ---
+<!-- _class: small -->
 
 # 上下标与分数
 
@@ -77,7 +78,7 @@ $$
 $$
 
 ---
-
+<!-- _class: small -->
 # 求和、积分、极限
 
 ## 求和与求积
@@ -105,7 +106,7 @@ $$
 $$
 
 ---
-
+<!-- _class: small -->
 # 希腊字母 & 常用符号
 
 | LaTeX | 渲染 |
@@ -124,7 +125,7 @@ $\pm \times \div \cdot \leq \geq \neq \approx \equiv \to \infty$
 ---
 
 # 矩阵
-
+<!-- _class: small -->
 `pmatrix` 是圆括号矩阵：
 
 $$
@@ -150,7 +151,7 @@ B = \begin{bmatrix}
 $$
 
 ---
-
+<!-- _class: small -->
 # 多行对齐
 
 `aligned` 环境用 `&` 对齐，`\\` 换行：
@@ -172,7 +173,7 @@ $$
 上面四个公式是麦克斯韦方程组的微分形式。
 
 ---
-
+<!-- _class: small -->
 # 分段函数
 
 `cases` 配合 `&` 和 `\\` 写分段函数：
@@ -195,7 +196,7 @@ x, & x > 0
 $$
 
 ---
-
+<!-- _class: small -->
 # 向量 / 范数
 
 向量通常用粗体或箭头：
@@ -219,7 +220,7 @@ b_1 & b_2 & b_3
 $$
 
 ---
-
+<!-- _class: small -->
 # 概率与统计
 
 正态分布密度函数：
@@ -243,7 +244,7 @@ $$
 $$
 
 ---
-
+<!-- _class: small -->
 # 几个著名公式
 
 傅里叶变换：
@@ -272,7 +273,7 @@ f(v) = \left(\frac{m}{2\pi k_B T}\right)^{3/2} \exp\!\left(-\frac{mv^2}{2k_B T}\
 $$
 
 ---
-
+<!-- _class: small -->
 # 公式行内 / 块级 排版建议
 
 **行内公式** `$ E = mc^2 $` 适合简单符号或简写术语 —— 不要写太长的行内公式，否则会拉爆排版。
@@ -288,25 +289,20 @@ $$
 $$
 
 ---
-
+<!-- _class: tiny -->
 <!-- _backgroundColor: "#0d1117" -->
 <!-- _color: white -->
 
 # 总结 :rocket:
 
-| 场景 | 语法 |
-|---|---|
-| 行内 | `$ E = mc^2 $` |
-| 块级 | `$$ ... $$` 独占一行 |
-| 分数 | `\frac{a}{b}` |
-| 根号 | `\sqrt{x}` / `\sqrt[n]{x}` |
-| 求和 | `\sum_{i=1}^{n}` |
-| 积分 | `\int_a^b f(x)\,dx` |
-| 极限 | `\lim_{x \to 0}` |
-| 矩阵 | `\begin{pmatrix}...\end{pmatrix}` |
-| 对齐 | `\begin{aligned}...\end{aligned}` |
-| 分段 | `\begin{cases}...\end{cases}` |
-| 颜色 | `\color{red}{text}` |
+| 场景 | 语法 | 场景 | 语法 |
+|---|---|---|---|
+| 行内 | `$ E = mc^2 $` | 块级 | `$$ ... $$` 独占一行 |
+| 分数 | `\frac{a}{b}` | 根号 | `\sqrt{x}` / `\sqrt[n]{x}` |
+| 求和 | `\sum_{i=1}^{n}` | 积分 | `\int_a^b f(x)\,dx` |
+| 极限 | `\lim_{x \to 0}` | 矩阵 | `\begin{pmatrix}...\end{pmatrix}` |
+| 对齐 | `\begin{aligned}...\end{aligned}` | 分段 | `\begin{cases}...\end{cases}` |
+| 颜色 | `\color{red}{text}` |  |  |*
 
 ```bash
 # 启用 katex 需要先装包
@@ -319,5 +315,3 @@ node packages/cli/bin/mddeck.js examples/math-demo.md \
 > 浏览器和 PDF 看到的公式完全一致。
 > 切换到 MathJax 引擎：front-matter 写 `math: mathjax`，或 CLI `--math mathjax`。
 > 不渲染公式：`math: false`，所有 `$...$` 当作普通文本。
-
-— mddeck 0.1.7

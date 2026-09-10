@@ -39,6 +39,7 @@ transitionDuration: 600
 ---
 
 ![bg](media/cover-1920x1085.jpg)
+<!-- _class: small -->
 
 # 简写：![bg]
 
@@ -52,7 +53,7 @@ transitionDuration: 600
 适合快速做"全屏图 + 标题"幻灯片。
 
 ---
-
+<!-- _class: small -->
 ![bg left:33%](media/avatar-1080x1080.jpg)
 
 # 左图右文
@@ -65,9 +66,8 @@ transitionDuration: 600
 
 ---
 
-<!-- _backgroundImage: url("./media/cover-1920x1085.jpg") -->
+<!-- _backgroundImage: url("./media/avatar-1080x1080.jpg") -->
 <!-- _backgroundSize: 200px auto -->
-<!-- _backgroundPosition: top right -->
 <!-- _backgroundRepeat: repeat-x -->
 <!-- _color: white -->
 
@@ -107,6 +107,8 @@ transitionDuration: 600
 
 ---
 
+<!-- _class: small -->
+
 # 文字 + 行内图片混排
 
 下面这张照片，演示最普通的 Markdown 用法：
@@ -118,6 +120,8 @@ transitionDuration: 600
 `opacity` 等，可以并列写：`![w:400px h:300px](image.png)`。
 
 ---
+
+<!-- _class: small -->
 
 # 多图并排
 
@@ -131,7 +135,7 @@ transitionDuration: 600
 > 排版，比裸的 `![w:Npx]` 段落（自动按行宽换行）稳得多。
 
 ---
-
+<!-- _color: white -->
 ![bg cover](media/photo5.jpg)
 
 # 整页是图：cover 满屏
@@ -139,15 +143,16 @@ transitionDuration: 600
 `![bg cover](image.jpg)` + 一段简短标题 —— 最常见的全屏图 keynote 模板。
 
 ---
-
+<!-- _color: white -->
 ![bg cover](media/photo4.jpg)
+
 
 # 整页是图：cover 风景
 
 换一张图，标题挪到左下角（通过加 `class: bottom-left` 等主题钩子）。
 
 ---
-
+<!-- _color: white -->
 ![bg cover](media/photo3.jpg)
 
 # 整页是图：cover 切换
@@ -156,7 +161,7 @@ transitionDuration: 600
 在不同容器里的呈现方式。
 
 ---
-
+<!-- _class: small -->
 ## 总结：mddeck 的图片语法
 
 - `<!-- _backgroundImage: url(...) -->` — 整张幻灯片设背景
@@ -170,21 +175,3 @@ transitionDuration: 600
 更复杂的滤镜（`![blur:Npx]` 等）见 `theme-impress.md`。所有 Marp 兼容的
 图片关键词在 mddeck 里都能用 —— 本示例强制 `perspective: 0` 来演示
 纯平铺切换，想恢复 3D 镜头效果改回 `1200` 即可。
-
----
-
-<!-- _backgroundColor: "#0d1117" -->
-<!-- _color: white -->
-<!-- _class: small -->
-
-## 致谢
-
-`backgroundColor: "#0d1117"` 配 `color: white` —— GitHub 风深色页作为结束页。
-
-```bash
-node packages/cli/bin/mddeck.js examples/images-demo.md \
-  -o examples/images-demo.html
-```
-
-按 **Esc** 退回 overview 模式查看缩略图，**P** 打开演讲者控制台。
-— mddeck 0.1.7
