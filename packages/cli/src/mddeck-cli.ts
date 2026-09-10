@@ -15,7 +15,14 @@ import { Converter } from './converter.js'
 import { File, loadFiles } from './file.js'
 import { loadConfig, mergeConfig } from './config.js'
 
-const VERSION = '0.1.0'
+// Version is injected at compile time via `--define process.env.MDDECK_VERSION='"x.y.z"'`.
+// The `declare const process` is only there to satisfy TypeScript's type
+// checker — Node/bun both provide `process` globally at runtime.
+// Falls back to the literal if the build pipeline doesn't inject (e.g. when
+// running `node packages/cli/bin/mddeck.js` directly without bun-compile).
+declare const process: { env: { MDDECK_VERSION?: string } }
+// prettier-ignore
+const VERSION: string = process.env.MDDECK_VERSION ?? '0.1.0'
 
 export async function cliInterface(argv: string[]): Promise<number> {
   // Load config (optional — don't block startup if it fails)

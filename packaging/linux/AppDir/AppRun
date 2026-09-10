@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# AppRun — AppImage entry point.
+#
+# Resolves the AppDir containing this script and exec's the mddeck binary
+# next to it, forwarding all arguments. AppImage sets $APPDIR to the mounted
+# directory at runtime, but we fall back to dirname-of-$0 so the script also
+# works in a freshly-extracted AppDir before packaging.
+set -e
+HERE="${APPDIR:-$(cd "$(dirname "$0")" && pwd)}"
+exec "$HERE/mddeck" "$@"

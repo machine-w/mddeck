@@ -24,3 +24,8 @@ examples/screenshots-images/
 
 # vsce/vsx publish artifacts
 *.vsix
+
+# bun (used only by the release workflow; repo's canonical lockfile is yarn.lock)
+bun.lock
+bun.lockb
+.bun-build/

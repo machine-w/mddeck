@@ -99,6 +99,63 @@ mddeck/
 
 ---
 
+## Installation
+
+### npm / npx (cross-platform, recommended for Node users)
+
+```bash
+npm install --save-dev @machine-w/mddeck-cli
+# or, without installing:
+npx mddeck --help
+```
+
+Requires Node.js 18 or later. The CLI is a single `mddeck` binary on your
+`$PATH` after install.
+
+### Download a prebuilt binary
+
+Grab the latest release for your platform from the
+[**GitHub Releases**](https://github.com/machine-w/mddeck/releases/latest)
+page. No Node.js installation required.
+
+| Platform | File |
+| --- | --- |
+| Linux x86_64 | `mddeck-*-linux-x64.AppImage` |
+| macOS — Apple Silicon (M1/M2/M3) | `mddeck-*-macos-arm64.dmg` |
+| macOS — Intel | `mddeck-*-macos-x64.dmg` |
+| Windows x86_64 | `mddeck-*-windows-x64-setup.exe` |
+
+**Linux AppImage** — make it executable, then run directly:
+
+```bash
+chmod +x mddeck-*-linux-x64.AppImage
+./mddeck-*-linux-x64.AppImage --help
+```
+
+> AppImage is glibc-based and won't run on Alpine/musl distros.
+
+**macOS** — open the `.dmg`, drag `mddeck` into the Applications folder (or
+anywhere on disk). The CLI itself is fully functional, but the binaries are
+**ad-hoc signed** (no paid Apple Developer ID), so Gatekeeper will block
+the first launch with "cannot be opened because the developer cannot be
+verified". To open:
+
+1. In Finder, right-click (or Control-click) the `mddeck` file.
+2. Choose **Open** from the context menu.
+3. Click **Open** in the dialog.
+
+You only need to do this once. Subsequent launches work with a normal
+double-click.
+
+> The `--pdf` option requires a Chromium binary on `$PATH` (or set
+> `PUPPETEER_EXECUTABLE_PATH`). The CLI does not bundle Chromium.
+
+**Windows** — run the setup `.exe` and follow the installer. The install
+directory is added to your user `PATH`, so `mddeck --help` works from any
+new `cmd` or PowerShell window afterwards.
+
+---
+
 ## Quick start
 
 ### 1. Install the CLI

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=mddeck
+GenericName=Markdown Slide Deck
+Comment=Convert Markdown to impress.js slide decks
+Exec=mddeck %F
+Icon=mddeck
+Categories=Office;TextEditor;
+Terminal=true
+StartupNotify=true
