@@ -226,8 +226,6 @@ jobs:
           VER="${TAG#v}"
           # `//D` so Git Bash on Windows doesn't rewrite `/D` to a path like `D:\…`
           iscc //DMyAppVersion="$VER" packaging/windows/installer.iss
-          mkdir -p packaging/windows
-          mv mddeck-*-windows-x64-setup.exe packaging/windows/ || true
           ls -la packaging/windows/*.exe
 
       - uses: actions/upload-artifact@v4
