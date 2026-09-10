@@ -17,6 +17,7 @@
 | [`theme-impress.md`](./theme-impress.md) | 内置 `impress` 主题 —— 复刻[官方 impress.js 演示](https://impress.js.org/)：白底卡片、柔和的径向渐变背景、PT Sans / PT Serif 字体。按 **Esc** 退出全屏，**P** 打开演讲者控制台。 |
 | [`theme-impress-flat.md`](./theme-impress-flat.md) | 类似 `impress`,但去掉了 1px 边框和圆角 —— 白卡仍带轻微的 drop shadow,保留一点深度感。 |
 | [`theme-impress-bare.md`](./theme-impress-bare.md) | 类似 `impress-flat`,但 slide 完全透明(无卡、无阴影) —— 文字直接浮在 canvas 上,像排版艺术。 |
+| [`text-sizes.md`](./text-sizes.md) | 走查全部 5 个字体大小工具类(`tiny` / `small` / `normal` / `big` / `huge`),每张 slide 用一种,直观看到缩放效果。用 `perspective: 0` 做平面切换。 |
 | [`t.md`](./t.md) | 最简 2 张幻灯片 —— smoke test,确认构建管线端到端能跑。 |
 
 ## `media/` 目录
@@ -31,6 +32,33 @@
 | `photo1.png` ... `photo5.jpg` | 各类 | 内联图片、网格混排 |
 
 这些图只是**测试占位**。要换图直接改 `.md` 文件里的路径即可。
+
+
+## 字体大小工具类
+
+六个内置主题都内置了 5 个工具类,按比例缩放整张幻灯片的文字。在 slide 顶部加 `<!-- _class: name -->` 即可应用:
+
+| 类名 | slide font-size | 适用场景 |
+|---|---|---|
+| `tiny` | 14px | 页脚脚注、图片版权、slide 末提示 |
+| `small` | 20px | 内容密集的 slide(长列表、代码为主) |
+| `normal` | 28px | 默认值 —— 在 tiny/huge 之后恢复标准尺寸 |
+| `big` | 42px | 标题 slide、关键陈述 |
+| `huge` | 60px | 英雄 slide、单字/单句冲击力 |
+
+每个主题的标题(`h1` / `h2` / `h3` / `code`)都基于 step 的 `font-size` 用 `em` 缩放,因此缩放 step 会按比例缩放全部文字。示例:
+
+```markdown
+<!-- _class: small -->
+
+## 整张 slide 用 20px 渲染
+
+- 列表和代码继承更小的尺寸
+- 适合密集的参考 slide
+```
+
+class 通过 Marpit 的 `<!-- _class: ... -->` 指令应用,同一类名在 6 个主题里都能用。
+
 
 ## 构建方式
 
