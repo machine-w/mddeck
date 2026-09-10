@@ -89,9 +89,9 @@ mddeck/
 
 | 包 | 状态 | 说明 |
 |---|---|---|
-| `@machine-w/mddeck-core` | ✅ v0.1.7 | 核心框架：Markdown → impress.js HTML + CSS |
-| `@machine-w/mddeck-cli` | ✅ v0.1.7 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
-| `mddeck-slides` (VSCode) | ✅ v0.1.7 | VSCode 扩展，编辑器内实时预览 |
+| `@machine-w/mddeck-core` | ✅ v0.1.8 | 核心框架：Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.8 | `mddeck` CLI 命令（HTML / PDF / watch / server） |
+| `mddeck-slides` (VSCode) | ✅ v0.1.8 | VSCode 扩展，编辑器内实时预览 |
 
 ---
 

@@ -93,9 +93,9 @@ mddeck/
 
 | Package | Status | Description |
 |---|---|---|
-| `@machine-w/mddeck-core` | ✅ v0.1.7 | The framework: Markdown → impress.js HTML + CSS |
-| `@machine-w/mddeck-cli` | ✅ v0.1.7 | The `mddeck` CLI command (HTML / PDF / watch / server) |
-| `mddeck-slides` (VSCode) | ✅ v0.1.7 | VSCode extension with live preview |
+| `@machine-w/mddeck-core` | ✅ v0.1.8 | The framework: Markdown → impress.js HTML + CSS |
+| `@machine-w/mddeck-cli` | ✅ v0.1.8 | The `mddeck` CLI command (HTML / PDF / watch / server) |
+| `mddeck-slides` (VSCode) | ✅ v0.1.8 | VSCode extension with live preview |
 
 ---
 
