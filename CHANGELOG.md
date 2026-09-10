@@ -25,6 +25,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.8] — 2026-09-03
+
+### Added
+- **`_note` directive for per-step speaker notes.** The new
+  `<!-- _note: ... -->` comment directive on any slide writes a
+  `<div class="notes">…</div>` into that step. impress.js's speaker
+  console (opened with the `P` key) reads that div and renders the
+  content in a separate window. The note value is run through a plain
+  `markdown-it` instance so users can write full Markdown (headings,
+  lists, links, code) without touching HTML.
+
+- **`tiny` / `small` / `normal` / `big` / `huge` font-size utility
+  classes in all six built-in themes.** Apply with
+  `<!-- _class: name -->` to scale a slide's text proportionally:
+  `tiny` = 14px, `small` = 20px, `normal` = 28px, `big` = 42px,
+  `huge` = 60px. The em-based headings / code / inline text inherit
+  the step's font-size and scale together. Documented in
+  `examples/README.md` (and `README_CN.md`); demoed in
+  `examples/text-sizes.md` which walks through all 5 classes one per
+  slide.
+
+- **Two new examples** — `examples/text-sizes.md` (font-size walk-
+  through, see above) and `examples/images-gaia.md` (the gaia-themed
+  variant of `images-demo.md`, showing the same image features under
+  a different visual style).
+
+### Fixed
+- **PDF export blank-page regression.** impress.js init applies
+  transforms at four levels (html/body height, #impress scale, the
+  anonymous centering wrapper, and `.step` translate3d). The old
+  `PRINT_MODE_CSS` only reset the last one, leaving the other three
+  in place, which put every slide off-screen in the PDF output.
+  Now `PRINT_MODE_CSS` resets all four, plus forces `html, body {
+  height: auto }` so the body grows to fit all stacked steps.
+
+- **PDF slides looked tiny inside a 1920×1080 page** (MarPit's
+  scaffold hardcodes `.step { width: 1280px; height: 720px }`).
+  `PRINT_MODE_CSS` now sets `.step { width: var(--pdf-w); height:
+  var(--pdf-h) }`, scales the root font-size by `--pdf-scale` so all
+  em-based descendants scale together, and centers content with
+  flexbox.
+
+- **Non-active steps faded in the PDF.** impress.js's speaker
+  default applies `.step.future, .step.past { opacity: 0.3 }`.
+  `PRINT_MODE_CSS` now adds `.notes { display: none }` and the
+  single `note` rule was tightened so the visible slides render at
+  full opacity in print.
+
+- **PDF slides no longer fade out at the end.** impress.js added
+  with `44b997b` rendered note content as raw HTML; `1837235` fixed
+  the underlying XSS sanitizer crash on attribute-bearing HTML; that
+  combined with `9a5208d`'s note directive means notes work both in
+  the live console and in PDF.
+
+- **`![bg left:N%](image)` text overlap.** Marpit's bg-image plugin
+  places the image as a slide background with background-position /
+  background-size ending in `% 100%`, but never pads the slide. Two
+  new CSS rules in the impress template match the inline style and
+  pad the matching side so the text flows beside the image instead of
+  over it. (Verified on `examples/images-demo.md` step-4.)
+
+- **XSS sanitizer crash on attribute-bearing HTML blocks.** The old
+  code in `packages/core/src/html/html.ts` called `friendlyAttrValue`
+  and `escapeAttrValue` from the `xss` package, but `xss` 1.0.15
+  removed both. The build crashed any time a markdown block contained
+  HTML with a `class=` attribute (including the `<div class="notes">`
+  the speaker-notes feature was about to ship). Replaced both with
+  the equivalent inline logic in the `safeAttrValue` callback.
+
+### Notes
+- 0.1.8 deprecates 0.1.4, 0.1.5, and 0.1.6 on npm. Direct upgrade
+  to 0.1.8 is recommended.
+- Public API is unchanged.
+
+
 ## [0.1.7] — 2026-09-03
 
 ### Added
