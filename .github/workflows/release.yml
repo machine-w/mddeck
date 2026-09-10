@@ -42,7 +42,7 @@ jobs:
         with:
           bun-version: latest
 
-      - run: bun install
+      - run: yarn install --frozen-lockfile
       - run: yarn build
 
       - name: Compile binary
@@ -109,7 +109,7 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
-      - run: bun install
+      - run: yarn install --frozen-lockfile
       - run: yarn build
 
       - name: Compile binary
@@ -157,7 +157,7 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
-      - run: bun install
+      - run: yarn install --frozen-lockfile
       - run: yarn build
 
       - name: Compile binary
@@ -204,7 +204,7 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
 
-      - run: bun install
+      - run: yarn install --frozen-lockfile
       - run: yarn build
 
       - name: Compile binary
