@@ -21,6 +21,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 DisableDirPage=no
 OutputBaseFilename=mddeck-{#MyAppVersion}-windows-x64-setup
+OutputDir=..\..\packaging\windows
 Compression=lzma2
 SolidCompression=yes
 SetupIconFile=icon.ico
