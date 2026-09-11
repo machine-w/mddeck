@@ -154,6 +154,44 @@ double-click.
 directory is added to your user `PATH`, so `mddeck --help` works from any
 new `cmd` or PowerShell window afterwards.
 
+### VS Code extension
+
+Install **mddeck — 3D Slide Deck Engine** (publisher `machine-w`) from the
+[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=machine-w.mddeck-slides).
+Gives you a live preview side panel that re-renders the deck as you edit
+the `.md`, plus an export-to-HTML/PDF command and quick-pick for the
+built-in themes.
+
+```bash
+# CLI alternative to the Extensions panel
+code --install-extension machine-w.mddeck-slides
+```
+
+### Claude Code skill
+
+The repo ships a guided workflow as a
+[Claude Code skill](https://docs.claude.com/en/docs/claude-code/skills) at
+[`skills/mddeck-slides/`](skills/mddeck-slides/). When installed, it
+walks you through authoring a deck — theme selection, transition style
+(flat / linear / polyhedron 3D), background images, duration estimation,
+content intake, outline confirmation, markdown generation, build, and CLI
+install detection.
+
+**Install (user-level, available across all projects):**
+```bash
+git clone https://github.com/machine-w/mddeck.git
+cp -r mddeck/skills/mddeck-slides ~/.claude/skills/
+# or symlink for in-place updates:
+ln -s "$(pwd)/mddeck/skills/mddeck-slides" ~/.claude/skills/mddeck-slides
+```
+
+**Use:** the skill triggers automatically when you ask Claude for slides,
+a talk, or a presentation. You can also invoke it explicitly with
+`/skill mddeck-slides` and answer its 8-step questionnaire.
+
+See [`skills/mddeck-slides/SKILL.md`](skills/mddeck-slides/SKILL.md) for
+the full workflow and bundled references / starter templates.
+
 ---
 
 ## Quick start

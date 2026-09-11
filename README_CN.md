@@ -95,6 +95,79 @@ mddeck/
 
 ---
 
+## 安装
+
+### npm / npx（跨平台，推荐 Node 用户）
+
+```bash
+npm install --save-dev @machine-w/mddeck-cli
+# 或者不安装直接用：
+npx mddeck --help
+```
+需要 Node.js 18 或更高版本。安装后 `mddeck` 命令就在 `$PATH` 里。
+
+### 下载预编译二进制
+
+从 [**GitHub Releases**](https://github.com/machine-w/mddeck/releases/latest)
+页面下载对应平台的最新版，**不需要装 Node**。
+
+| 平台 | 文件 |
+| --- | --- |
+| Linux x86_64 | `mddeck-*-linux-x64.AppImage` |
+| macOS — Apple Silicon (M1/M2/M3) | `mddeck-*-macos-arm64.dmg` |
+| macOS — Intel | `mddeck-*-macos-x64.dmg` |
+| Windows x86_64 | `mddeck-*-windows-x64-setup.exe` |
+
+**Linux AppImage**：先 chmod 然后直接运行：
+```bash
+chmod +x mddeck-*-linux-x64.AppImage
+./mddeck-*-linux-x64.AppImage --help
+```
+> AppImage 是 glibc 版本，在 Alpine/musl 上跑不了。
+
+**macOS**：打开 `.dmg`，把 `mddeck` 拖到 Applications（或任意位置）。但二进制是 **ad-hoc 签名**（没有付费 Apple Developer ID），Gatekeeper 首次启动会拦截。要"打开：
+1. 在 Finder 里**右键**（或 Control-点击）`mddeck` 文件
+2. 菜单里选 **Open**
+3. 在对话框里点 **Open**
+
+只需要操作一次，之后双击就能正常打开。
+
+> `--pdf` 需要系统里有 Chromium（在 `$PATH` 或设置 `PUPPETEER_EXECUTABLE_PATH`），CLI 不打包 Chromium。
+
+**Windows**：运行安装 `.exe`，按引导走完。安装目录会自动加到用户 `PATH`，之后在任意新开的 `cmd` 或 PowerShell 窗口里 `mddeck --help` 都能用。
+
+### VS Code 插件
+
+从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=machine-w.mddeck-slides) 安装 **mddeck — 3D Slide Deck Engine**（发布者 `machine-w`）。
+提供 `.md` 文件的实时预览侧边栏、导出 HTML/PDF 命令、内置主题选择器。
+
+```bash
+# 命令行安装（等价于在 Extensions 面板里搜）
+code --install-extension machine-w.mddeck-slides
+```
+
+### Claude Code 技能（skill）
+
+仓库自带一个引导式工作流作为 [Claude Code skill](https://docs.claude.com/en/docs/claude-code/skills)，
+放在 [`skills/mddeck-slides/`](skills/mddeck-slides/)。装上后，它会一步步带你完成一个 deck：
+主题选择 → 切换风格（平面 / 直线 / 多面体 3D）→ 背景图 → 时长估算 → 内容采集 →
+大纲确认 → 生成 markdown → 构建 → CLI 安装检测。
+
+**安装（用户级，所有项目都能用）：**
+```bash
+git clone https://github.com/machine-w/mddeck.git
+cp -r mddeck/skills/mddeck-slides ~/.claude/skills/
+# 或者用软链接方便后续更新：
+ln -s "$(pwd)/mddeck/skills/mddeck-slides" ~/.claude/skills/mddeck-slides
+```
+
+**使用**：当你说"做幻灯片"、"演讲"、"presentation"这类词时，技能会自动触发。
+也可以直接 `/skill mddeck-slides` 显式调用，然后回答它的 8 步问卷。
+
+完整工作流和内嵌的参考 / 起始模板见 [`skills/mddeck-slides/SKILL.md`](skills/mddeck-slides/SKILL.md)。
+
+---
+
 ## 5 分钟上手
 
 ### 1. 安装 CLI
