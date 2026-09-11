@@ -150,9 +150,11 @@ double-click.
 > The `--pdf` option requires a Chromium binary on `$PATH` (or set
 > `PUPPETEER_EXECUTABLE_PATH`). The CLI does not bundle Chromium.
 
-**Windows** — run the setup `.exe` and follow the installer. The install
-directory is added to your user `PATH`, so `mddeck --help` works from any
-new `cmd` or PowerShell window afterwards.
+**Windows** — run the setup `.exe` and follow the installer. It installs
+per-user to `%LocalAppData%\Programs\mddeck` (no admin / UAC needed) and
+appends that directory to your user `PATH`. **Open a NEW `cmd` or
+PowerShell window** after install (existing windows still have the old
+PATH) and run `mddeck --version`.
 
 ### VS Code extension
 

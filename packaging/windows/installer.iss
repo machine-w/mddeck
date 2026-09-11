@@ -17,7 +17,13 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}/issues
-DefaultDirName={autopf}\{#MyAppName}
+; Per-user install into %LocalAppData%\Programs — no admin / UAC needed, and
+; the HKCU PATH write below lands in the actual current user's hive (the
+; default {autopf}\mddeck install requires elevation, which writes PATH
+; into the elevated process's HKCU instead of the interactive user's,
+; making `mddeck` invisible in freshly opened cmd windows).
+DefaultDirName={localappdata}\Programs\{#MyAppName}
+PrivilegesRequired=lowest
 DisableProgramGroupPage=yes
 DisableDirPage=no
 OutputBaseFilename=mddeck-{#MyAppVersion}-windows-x64-setup
@@ -32,6 +38,10 @@ ArchitecturesInstallIn64BitMode=x64compatible
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Messages]
+; Shown after a successful install — confirm what just happened.
+FinishedLabel=mddeck was installed successfully.%n%nThe install directory has been appended to your user PATH. Open a NEW cmd.exe / PowerShell window and run:%n%n  mddeck --version%n%nIf `mddeck` is still not found, restart any open shells and try again.
+
 [Files]
 ; Paths are relative to the repo root (one level up from this script).
 Source: "..\..\build\{#MyAppExeName}"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion
@@ -42,8 +52,10 @@ Source: "..\..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Registry]
-; Append the install directory to the user PATH (HKCU\Environment). No reboot
-; required for the new PATH to take effect in newly-spawned shells.
+; Append the install directory to the current user's PATH (HKCU\Environment).
+; With PrivilegesRequired=lowest, the installer runs as the current user
+; (no UAC), so this write lands in the right HKCU and newly-spawned
+; shells immediately see `mddeck` on PATH.
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; \
   ValueData: "{olddata};{app}"; Check: NeedsAddPath
 
@@ -54,6 +66,6 @@ var
 begin
   if not RegQueryStringValue(HKEY_CURRENT_USER, 'Environment', 'Path', OrigPath) then
     OrigPath := '';
-  // Pos returns 0 if not found; the substring already includes the surrounding braces.
-  Result := Pos(ExpandConstant('{app}'), OrigPath) = 0;
+  // Case-insensitive substring check; Pos returns 0 if not found.
+  Result := Pos(UpperCase(ExpandConstant('{app}')), UpperCase(OrigPath)) = 0;
 end;

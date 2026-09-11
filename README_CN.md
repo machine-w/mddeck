@@ -134,7 +134,7 @@ chmod +x mddeck-*-linux-x64.AppImage
 
 > `--pdf` 需要系统里有 Chromium（在 `$PATH` 或设置 `PUPPETEER_EXECUTABLE_PATH`），CLI 不打包 Chromium。
 
-**Windows**：运行安装 `.exe`，按引导走完。安装目录会自动加到用户 `PATH`，之后在任意新开的 `cmd` 或 PowerShell 窗口里 `mddeck --help` 都能用。
+**Windows**：运行安装 `.exe`，按引导走完。安装到 `%LocalAppData%\Programs\mddeck`（用户级，**不需要 UAC 提升**），并把安装目录加到当前用户的 `PATH`。**装完开一个全新的 `cmd` 或 PowerShell 窗口**（旧窗口还是旧的 PATH），跑 `mddeck --version`。
 
 ### VS Code 插件
 
