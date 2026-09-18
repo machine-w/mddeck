@@ -118,38 +118,62 @@ Write the deck. Follow `references/syntax.md` exactly. Important rules:
 
 Write the file with `Write`. Confirm the path to the user.
 
-### Phase 8 — Build outputs
+### Phase 8 — Offer to generate HTML / PDF
 
-Ask: "Build the deck?"
+**This step is mandatory after writing the markdown file.** Do not skip it. The user almost always wants a built artifact, so always ask before assuming.
+
+Use `AskUserQuestion` to ask: "Build the deck?" with these options:
+
 - **HTML only** — `mddeck <file>.md -o <file>.html`
 - **HTML + PDF** — `mddeck <file>.md --pdf -o <file>.pdf`. Note: PDF needs Chromium on `$PATH` (or set `PUPPETEER_EXECUTABLE_PATH`). If the user chose PDF, run `which chromium google-chrome chrome 2>/dev/null` first; warn if not found and offer to skip PDF.
 - **Just markdown, no build** — for cases where the user wants to edit before rendering.
 
-### Phase 9 — CLI installation
+If the user picks **HTML only** or **HTML + PDF**, proceed to Phase 9 to ensure the CLI is available, then run the build. If the user picks **Just markdown, no build**, stop here — confirm the file path and end the workflow.
 
-Before running any `mddeck` command, check whether the CLI is installed:
+### Phase 9 — Ensure `mddeck` CLI is available, then build
+
+**Before running any `mddeck` command, you MUST verify the CLI is installed.** If it is not, install it for the user — do not just hand them a command and walk away.
+
+**Step 1: Check installation**
 
 ```bash
 which mddeck || command -v mddeck
 ```
 
-If found, great — proceed. If not, walk the user through installation:
+**Step 2a: If `mddeck` is found**, proceed to Step 3 and build.
 
-**Fastest path (cross-platform): npm**
-```bash
-npm install -g @machine-w/mddeck-cli
-```
-Requires Node.js 18+.
+**Step 2b: If `mddeck` is NOT found**, install it. Run the appropriate command yourself (do not just show it):
 
-**Pre-built binaries (no Node needed)**: https://github.com/machine-w/mddeck/releases/latest
-- macOS Apple Silicon: `mddeck-*-macos-arm64.dmg`
-- macOS Intel: `mddeck-*-macos-x64.dmg`
-- Linux: `mddeck-*-linux-x64.AppImage`
-- Windows: `mddeck-*-windows-x64-setup.exe`
+- **Preferred — npm (cross-platform)**:
+  ```bash
+  npm install -g @machine-w/mddeck-cli
+  ```
+  Requires Node.js 18+. If the install fails due to permissions, retry with `sudo npm install -g @machine-w/mddeck-cli` on macOS/Linux. If it still fails, fall back to a pre-built binary from https://github.com/machine-w/mddeck/releases/latest:
+  - macOS Apple Silicon: `mddeck-*-macos-arm64.dmg`
+  - macOS Intel: `mddeck-*-macos-x64.dmg`
+  - Linux: `mddeck-*-linux-x64.AppImage`
+  - Windows: `mddeck-*-windows-x64-setup.exe`
 
-**If npm install fails** (e.g. user lacks permission): try `sudo npm install -g ...`, or fall back to the binary download.
+After installing, re-run `which mddeck` to confirm it's on `$PATH`. If it's still missing, point the user at https://github.com/machine-w/mddeck/releases/latest and stop — do not attempt the build.
 
-Only attempt automated install if the user explicitly asks. Otherwise just give the commands and let them run.
+**Step 3: Build the deck.** Run the command that matches what the user chose in Phase 8:
+
+- HTML only:
+  ```bash
+  mddeck <file>.md -o <file>.html
+  ```
+- HTML + PDF:
+  ```bash
+  mddeck <file>.md --pdf -o <file>.pdf
+  ```
+
+Report the output paths to the user when done.
+
+**Step 4: Mention the VS Code extension for previewing.** After a successful build, always tell the user they can install the `mddeck-slides` VS Code extension for live previews while editing:
+
+> Tip: Install the `mddeck-slides` VS Code extension (search the Marketplace or run `code --install-extension mddeck-slides`) to preview your deck live as you edit the markdown. See https://github.com/machine-w/mddeck for details.
+
+This applies whether or not the build succeeded — if it failed, mention the extension as a fallback way to inspect the deck.
 
 ## Notes on directive selection
 
